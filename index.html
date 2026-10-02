@@ -1,156 +1,1678 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#f5f1e8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#26382f">
 <title>Our Table</title>
+
 <style>
-:root{
-  --bg:#f6f2e9; --surface:#fffdf8; --ink:#292821; --muted:#777267;
-  --sage:#66745d; --sage-dark:#4e5d47; --terracotta:#a9634e; --line:#ddd6c8;
-  --shadow:0 8px 28px rgba(45,39,29,.08); --radius:18px;
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Libre+Baskerville:wght@400;700&display=swap');
+
+:root {
+  --cream: #f6f2e9;
+  --paper: #fffdf8;
+  --espresso: #292a25;
+  --forest: #26382f;
+  --olive: #687252;
+  --terracotta: #a86148;
+  --ochre: #b58c4a;
+  --blue: #526772;
+  --muted: #77766e;
+  --line: #ded7ca;
+  --soft-green: #e7e9df;
+  --soft-terra: #f0e3dc;
+  --shadow: 0 8px 30px rgba(45,40,30,.07);
 }
-*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);
-font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-button,input,textarea,select{font:inherit} button{cursor:pointer}
-.app{max-width:900px;margin:auto;padding:18px 16px 92px}
-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
-.brand{font-family:Georgia,serif;font-size:30px}.sub{color:var(--muted);font-size:13px}
-nav{position:fixed;z-index:10;bottom:0;left:0;right:0;background:rgba(255,253,248,.96);
-border-top:1px solid var(--line);display:flex;justify-content:center;backdrop-filter:blur(10px)}
-nav button{border:0;background:none;padding:12px 18px;color:var(--muted);font-size:12px}
-nav button.active{color:var(--sage-dark);font-weight:700}
-h1,h2,h3{font-family:Georgia,serif;font-weight:500}.section-head{display:flex;justify-content:space-between;align-items:center}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
-.week{display:grid;gap:10px}
-.day{padding:15px}.dayname{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.meal-title{font-family:Georgia,serif;font-size:21px;margin:5px 0}
-.meta{font-size:12px;color:var(--muted)}
-.empty{color:var(--muted);padding:10px 0}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 14px}
-.btn.primary{background:var(--sage-dark);color:white;border-color:var(--sage-dark)}
-.btn.ghost{background:transparent}.btn.danger{color:#9a493d}
-.list{display:grid;gap:8px}.item{display:flex;align-items:center;gap:10px;padding:12px 14px}
-.item input[type=checkbox]{width:19px;height:19px;accent-color:var(--sage)}
-.item.done span{text-decoration:line-through;color:var(--muted)}
-.category{margin-top:18px;color:var(--sage-dark);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
-.form{display:grid;gap:12px}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
-.field input,.field textarea,.field select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}
-textarea{min-height:90px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.meal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-.meal-card{padding:16px}.star{border:0;background:none;font-size:20px;float:right}
-.hidden{display:none!important}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#ece8dd;color:var(--sage-dark);font-size:11px;margin:3px 3px 0 0}
-.modal{position:fixed;inset:0;background:rgba(35,31,24,.45);display:flex;align-items:flex-end;justify-content:center;z-index:20}
-.modal-box{background:var(--surface);width:min(680px,100%);max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:20px}
-@media(min-width:700px){.app{padding-bottom:30px}.week{grid-template-columns:1fr 1fr}.day:last-child{grid-column:span 2}nav{position:sticky;top:0;border:0;justify-content:flex-start;margin:0 -16px 20px}.modal{align-items:center}.modal-box{border-radius:24px}}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--espresso);
+  font-family: "DM Sans", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app {
+  width: 100%;
+  max-width: 760px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding-bottom: 90px;
+}
+
+/* HEADER */
+
+header {
+  padding: 27px 22px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  color: var(--forest);
+  font-family: "Libre Baskerville", serif;
+  font-size: 25px;
+  letter-spacing: -.5px;
+}
+
+.brand-subtitle {
+  display: block;
+  margin-top: 6px;
+  color: var(--olive);
+  font-family: "DM Sans", sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.header-mark {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--forest);
+  font-size: 20px;
+}
+
+/* VIEWS */
+
+.view {
+  display: none;
+  padding: 4px 22px 30px;
+}
+
+.view.active {
+  display: block;
+}
+
+/* TYPE */
+
+.eyebrow {
+  margin-bottom: 7px;
+  color: var(--olive);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: "Libre Baskerville", serif;
+  font-weight: 400;
+}
+
+h1 {
+  font-size: 30px;
+  line-height: 1.2;
+  letter-spacing: -.5px;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+.page-header {
+  margin: 12px 0 25px;
+}
+
+.page-subtitle {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* BUTTONS */
+
+.primary-button {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 16px;
+  background: var(--forest);
+  color: white;
+  font-weight: 600;
+}
+
+.secondary-button {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 11px 15px;
+  background: var(--paper);
+  color: var(--forest);
+  font-weight: 600;
+}
+
+.text-button {
+  border: none;
+  padding: 4px 0;
+  background: transparent;
+  color: var(--olive);
+  font-size: 13px;
+}
+
+/* ADD RECIPE */
+
+.add-recipe-card {
+  margin-bottom: 27px;
+  padding: 19px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--forest);
+  color: white;
+  box-shadow: var(--shadow);
+}
+
+.add-recipe-card h2 {
+  font-size: 20px;
+}
+
+.add-recipe-card p {
+  margin: 7px 0 15px;
+  color: #d9ded8;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.url-row {
+  display: flex;
+  gap: 8px;
+}
+
+.url-input {
+  min-width: 0;
+  flex: 1;
+  border: none;
+  border-radius: 9px;
+  padding: 12px;
+  background: rgba(255,255,255,.96);
+  color: var(--espresso);
+  outline: none;
+}
+
+.url-input::placeholder {
+  color: #99978f;
+}
+
+.import-button {
+  flex: 0 0 auto;
+  border: none;
+  border-radius: 9px;
+  padding: 0 14px;
+  background: var(--terracotta);
+  color: white;
+  font-weight: 600;
+}
+
+/* MEAL CARDS */
+
+.meal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.meal-card {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  padding: 16px 17px;
+  background: var(--paper);
+  display: grid;
+  grid-template-columns: 60px 1fr 20px;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  color: var(--espresso);
+  box-shadow: 0 2px 9px rgba(40,35,25,.025);
+  transition: .16s ease;
+}
+
+.meal-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.day {
+  color: var(--olive);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.day-number {
+  display: block;
+  margin-top: 4px;
+  color: var(--espresso);
+  font-family: "Libre Baskerville", serif;
+  font-size: 20px;
+}
+
+.meal-name {
+  font-family: "Libre Baskerville", serif;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.meal-description {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.arrow {
+  color: var(--terracotta);
+  font-family: Georgia, serif;
+  font-size: 24px;
+}
+
+/* RECIPE BOX */
+
+.recipe-box-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.recipe-box-card {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  padding: 16px 17px;
+  background: var(--paper);
+  text-align: left;
+  color: var(--espresso);
+}
+
+.recipe-box-card .recipe-box-name {
+  font-family: "Libre Baskerville", serif;
+  font-size: 16px;
+}
+
+.recipe-box-card .recipe-box-meta {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* RECIPE DETAIL */
+
+.back-button {
+  border: none;
+  background: transparent;
+  padding: 6px 0 22px;
+  color: var(--olive);
+  font-size: 14px;
+}
+
+.detail-kicker {
+  margin-bottom: 9px;
+  color: var(--olive);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.7px;
+  text-transform: uppercase;
+}
+
+.detail-title {
+  font-size: 30px;
+  line-height: 1.2;
+}
+
+.detail-description {
+  margin: 12px 0 18px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.recipe-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 26px;
+}
+
+.recipe-meta span {
+  padding: 7px 10px;
+  border-radius: 20px;
+  background: var(--soft-green);
+  color: var(--forest);
+  font-size: 12px;
+}
+
+.recipe-section {
+  margin-top: 23px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.recipe-section h2 {
+  margin-bottom: 12px;
+}
+
+.ingredients {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ingredients li {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 9px 0;
+  border-bottom: 1px solid #ebe5da;
+  font-size: 14px;
+}
+
+.ingredients li span:last-child {
+  color: var(--muted);
+  text-align: right;
+}
+
+.directions {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  counter-reset: recipe-step;
+}
+
+.directions li {
+  position: relative;
+  counter-increment: recipe-step;
+  padding: 0 0 22px 44px;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.directions li::before {
+  content: counter(recipe-step);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--forest);
+  color: white;
+  font-size: 12px;
+  line-height: 28px;
+  text-align: center;
+}
+
+.directions strong {
+  display: block;
+  margin-bottom: 3px;
+  font-family: "Libre Baskerville", serif;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+/* ASSIGN */
+
+.assign-box {
+  margin-top: 24px;
+  padding: 17px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--paper);
+}
+
+.assign-box label {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.assign-row {
+  display: flex;
+  gap: 8px;
+}
+
+.day-select {
+  flex: 1;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 11px;
+  background: white;
+}
+
+/* GROCERY */
+
+.grocery-group {
+  margin-bottom: 12px;
+  padding: 17px 18px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--paper);
+}
+
+.grocery-group h2 {
+  margin-bottom: 9px;
+}
+
+.grocery-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 39px;
+  border-bottom: 1px solid #ebe5da;
+  font-size: 14px;
+}
+
+.grocery-item:last-child {
+  border-bottom: none;
+}
+
+.grocery-item input {
+  appearance: none;
+  width: 19px;
+  height: 19px;
+  margin: 0;
+  border: 1px solid #aaa398;
+  border-radius: 50%;
+}
+
+.grocery-item input:checked {
+  position: relative;
+  border-color: var(--forest);
+  background: var(--forest);
+}
+
+.grocery-item input:checked::after {
+  content: "✓";
+  position: absolute;
+  left: 4px;
+  top: 0;
+  color: white;
+  font-size: 12px;
+}
+
+.grocery-item:has(input:checked) span {
+  color: #aaa;
+  text-decoration: line-through;
+}
+
+/* EMPTY */
+
+.empty {
+  padding: 30px 10px;
+  color: var(--muted);
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* NAV */
+
+.bottom-nav {
+  position: fixed;
+  z-index: 20;
+  bottom: 0;
+  left: 50%;
+  width: min(760px,100%);
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: space-around;
+  padding: 9px 8px max(10px,env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  background: rgba(255,253,248,.96);
+  backdrop-filter: blur(12px);
+}
+
+.nav-button {
+  border: none;
+  background: transparent;
+  padding: 4px 18px;
+  color: #8b887f;
+  font-size: 10px;
+}
+
+.nav-icon {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 20px;
+}
+
+.nav-button.active {
+  color: var(--forest);
+  font-weight: 600;
+}
+
+@media (min-width:650px) {
+  .app {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
 </style>
 </head>
+
 <body>
+
 <div class="app">
-<header><div><div class="brand">Our Table</div><div class="sub">Meals, recipes & groceries</div></div></header>
-<nav id="nav">
-<button data-view="week" class="active">This Week</button>
-<button data-view="meals">Meals</button>
-<button data-view="grocery">Grocery</button>
-<button data-view="pantry">Pantry</button>
-<button data-view="history">History</button>
-</nav>
-<main id="main"></main>
+
+<header>
+  <div class="brand">
+    Our Table
+    <span class="brand-subtitle">Family meal planner</span>
+  </div>
+
+  <div class="header-mark">⌂</div>
+</header>
+
+
+<!-- WEEK -->
+
+<section id="weekView" class="view active">
+
+  <div class="page-header">
+    <div class="eyebrow">This week</div>
+    <h1>What we're eating</h1>
+    <div class="page-subtitle">
+      October 5 — October 11
+    </div>
+  </div>
+
+  <div id="mealList" class="meal-list"></div>
+
+</section>
+
+
+<!-- RECIPE BOX -->
+
+<section id="recipesView" class="view">
+
+  <div class="page-header">
+    <div class="eyebrow">Your collection</div>
+    <h1>Recipe box</h1>
+    <div class="page-subtitle">
+      Recipes you've saved to Our Table
+    </div>
+  </div>
+
+  <div class="add-recipe-card">
+
+    <h2>Add a recipe</h2>
+
+    <p>
+      Paste a recipe URL and Our Table will import the recipe
+      into your collection.
+    </p>
+
+    <div class="url-row">
+
+      <input
+        id="recipeUrl"
+        class="url-input"
+        type="url"
+        placeholder="Paste recipe URL"
+      >
+
+      <button
+        class="import-button"
+        onclick="importRecipe()"
+      >
+        Import
+      </button>
+
+    </div>
+
+  </div>
+
+  <div id="recipeBoxList" class="recipe-box-list"></div>
+
+</section>
+
+
+<!-- GROCERY -->
+
+<section id="groceryView" class="view">
+
+  <div class="page-header">
+    <div class="eyebrow">From this week's meals</div>
+    <h1>Grocery list</h1>
+    <div class="page-subtitle">
+      Generated from the recipes on your week
+    </div>
+  </div>
+
+  <div id="groceryList"></div>
+
+</section>
+
+
+<!-- RECIPE -->
+
+<section id="recipeView" class="view">
+
+  <button
+    class="back-button"
+    onclick="showView('week')"
+  >
+    ← Back
+  </button>
+
+  <div id="recipeContent"></div>
+
+</section>
+
 </div>
-<div id="modal" class="modal hidden"><div class="modal-box" id="modalBox"></div></div>
+
+
+<nav class="bottom-nav">
+
+  <button
+    id="weekNav"
+    class="nav-button active"
+    onclick="showView('week')"
+  >
+    <span class="nav-icon">⌂</span>
+    Week
+  </button>
+
+  <button
+    id="recipesNav"
+    class="nav-button"
+    onclick="showView('recipes')"
+  >
+    <span class="nav-icon">▢</span>
+    Recipes
+  </button>
+
+  <button
+    id="groceryNav"
+    class="nav-button"
+    onclick="showView('grocery')"
+  >
+    <span class="nav-icon">□</span>
+    Grocery
+  </button>
+
+</nav>
+
+
 <script>
-const seedMeals=[
- {id:"1",name:"Hidden Veggie Pasta",url:"",ingredients:[["pasta","1","box","Pantry"],["marinara sauce","1","jar","Pantry"],["zucchini","1","each","Produce"]],notes:"A simple family favorite.",favorite:true,tags:["Vegetarian"]},
- {id:"2",name:"Black Bean & Sweet Potato Bowls",url:"",ingredients:[["black beans","2","cans","Pantry"],["sweet potatoes","3","each","Produce"],["avocado","2","each","Produce"],["lime","2","each","Produce"]],notes:"Serve components separately for easy customization.",favorite:false,tags:["Vegetarian","Quick"]},
- {id:"3",name:"Mediterranean Chickpea Pitas",url:"",ingredients:[["chickpeas","2","cans","Pantry"],["pitas","1","package","Pantry"],["cucumber","1","each","Produce"],["feta","4","oz","Refrigerated"]],notes:"",favorite:true,tags:["Vegetarian"]},
- {id:"4",name:"Pizza Night",url:"",ingredients:[["pizza","1","","Frozen"]],notes:"",favorite:true,tags:["Easy"]},
- {id:"5",name:"Coconut Shrimp",url:"",ingredients:[["shrimp","1","lb","Frozen"],["coconut milk","1","can","Pantry"],["garlic","3","cloves","Produce"]],notes:"",favorite:false,tags:["Seafood"]},
- {id:"6",name:"Chicken & White Bean Soup",url:"",ingredients:[["chicken","1","lb","Refrigerated"],["white beans","2","cans","Pantry"],["carrots","3","each","Produce"],["celery","3","stalks","Produce"]],notes:"",favorite:false,tags:[]}
+
+/*
+==================================================
+OUR TABLE DATA
+==================================================
+
+Important:
+Recipes are stored separately from the weekly plan.
+
+That means a recipe can live in the Recipe Box
+without being assigned to a particular week.
+
+The weekly plan simply references recipe IDs.
+
+This is the structure the URL importer will use.
+*/
+
+
+const defaultRecipes = [
+
+  {
+    id: "hidden-veggie-pasta",
+    name: "Hidden Veggie Pasta",
+    description: "creamy marinara · roasted vegetables · parmesan",
+    time: "35 min",
+    servings: "4",
+
+    ingredients: [
+      ["Pasta", "12 oz"],
+      ["Zucchini", "1 medium"],
+      ["Carrot", "1 large"],
+      ["Bell pepper", "1"],
+      ["Marinara sauce", "24 oz"],
+      ["Parmesan", "½ cup"],
+      ["Olive oil", "2 tbsp"]
+    ],
+
+    directions: [
+      ["Roast the vegetables",
+       "Heat the oven to 425°F. Chop the zucchini, carrot, and bell pepper. Toss with olive oil and roast for 20–25 minutes until tender."],
+
+      ["Cook the pasta",
+       "Boil salted water and cook the pasta according to the package directions. Reserve about ½ cup pasta water, then drain."],
+
+      ["Make the sauce",
+       "Blend the roasted vegetables with the marinara until smooth. Add a splash of pasta water if needed."],
+
+      ["Bring it together",
+       "Toss the pasta with the sauce and parmesan. Loosen with reserved pasta water as needed."]
+    ]
+  },
+
+  {
+    id: "black-bean-bowls",
+    name: "Black Bean + Sweet Potato Bowls",
+    description: "roasted sweet potatoes · black beans · avocado",
+    time: "40 min",
+    servings: "4",
+
+    ingredients: [
+      ["Sweet potatoes", "3"],
+      ["Black beans", "2 cans"],
+      ["Quinoa", "1 cup"],
+      ["Avocados", "2"],
+      ["Lime", "2"],
+      ["Olive oil", "2 tbsp"],
+      ["Cumin", "1 tsp"]
+    ],
+
+    directions: [
+      ["Roast the sweet potatoes",
+       "Heat oven to 425°F. Cube sweet potatoes, toss with olive oil and cumin, and roast 25–30 minutes."],
+
+      ["Cook the quinoa",
+       "Combine quinoa with 2 cups water. Simmer covered about 15 minutes, then fluff."],
+
+      ["Warm the beans",
+       "Drain and rinse the beans. Warm gently with cumin, salt, pepper, and lime."],
+
+      ["Assemble",
+       "Divide quinoa between bowls and top with sweet potatoes, beans, avocado, and lime."]
+    ]
+  },
+
+  {
+    id: "leftovers",
+    name: "Leftovers + Sandwiches",
+    description: "use what is already in the fridge",
+    time: "—",
+    servings: "as needed",
+
+    ingredients: [
+      ["Leftovers", "as needed"],
+      ["Bread or wraps", "as needed"],
+      ["Fresh fruit", "as needed"]
+    ],
+
+    directions: [
+      ["Check the fridge",
+       "Start with anything that needs to be used first."],
+
+      ["Build dinner",
+       "Make sandwiches, wraps, or simple plates around what you already have."],
+
+      ["Add something fresh",
+       "Serve with fruit or vegetables."]
+    ]
+  },
+
+  {
+    id: "mediterranean-chickpea-pitas",
+    name: "Mediterranean Chickpea Pitas",
+    description: "crispy chickpeas · cucumber · feta · lemon",
+    time: "25 min",
+    servings: "4",
+
+    ingredients: [
+      ["Chickpeas", "2 cans"],
+      ["Pitas", "4"],
+      ["Cucumber", "1"],
+      ["Tomatoes", "2"],
+      ["Feta", "4 oz"],
+      ["Lemon", "1"],
+      ["Greek yogurt", "½ cup"],
+      ["Olive oil", "2 tbsp"]
+    ],
+
+    directions: [
+      ["Crisp the chickpeas",
+       "Drain and dry chickpeas. Season and air fry at 400°F for 12–15 minutes, shaking halfway."],
+
+      ["Make the salad",
+       "Dice cucumber and tomatoes. Toss with lemon, olive oil, salt, and pepper. Add feta."],
+
+      ["Make the sauce",
+       "Stir Greek yogurt with lemon juice and a splash of water."],
+
+      ["Fill the pitas",
+       "Warm pitas and fill with salad and crispy chickpeas. Drizzle with yogurt sauce."]
+    ]
+  },
+
+  {
+    id: "pizza-night",
+    name: "Pizza Night",
+    description: "everyone gets to choose their toppings",
+    time: "20 min",
+    servings: "4",
+
+    ingredients: [
+      ["Pizza dough or crusts", "2"],
+      ["Pizza sauce", "1 cup"],
+      ["Mozzarella", "8 oz"],
+      ["Favorite toppings", "as needed"]
+    ],
+
+    directions: [
+      ["Heat the oven",
+       "Follow the dough or crust package temperature, usually around 450–500°F."],
+
+      ["Build the pizzas",
+       "Spread sauce over the crusts and add mozzarella and toppings."],
+
+      ["Bake",
+       "Bake until the crust is crisp and the cheese is bubbling."]
+    ]
+  },
+
+  {
+    id: "coconut-shrimp",
+    name: "Coconut Shrimp",
+    description: "crispy coconut coating · lime · rice",
+    time: "30 min",
+    servings: "4",
+
+    ingredients: [
+      ["Shrimp", "1 lb"],
+      ["Shredded coconut", "1 cup"],
+      ["Panko", "1 cup"],
+      ["Eggs", "2"],
+      ["Flour", "½ cup"],
+      ["Lime", "1"],
+      ["Rice", "1½ cups"]
+    ],
+
+    directions: [
+      ["Set up the coating",
+       "Place flour, beaten eggs, and coconut mixed with panko in three separate bowls."],
+
+      ["Coat the shrimp",
+       "Dip shrimp in flour, then egg, then coconut-panko mixture."],
+
+      ["Cook",
+       "Air fry at 400°F for 8–10 minutes, turning halfway."],
+
+      ["Serve",
+       "Serve with rice and lime wedges."]
+    ]
+  },
+
+  {
+    id: "chicken-white-bean-soup",
+    name: "Chicken + White Bean Soup",
+    description: "cozy, brothy, and made for leftovers",
+    time: "50 min",
+    servings: "6",
+
+    ingredients: [
+      ["Chicken breast", "1 lb"],
+      ["Cannellini beans", "2 cans"],
+      ["Carrots", "2"],
+      ["Celery", "2 stalks"],
+      ["Onion", "1"],
+      ["Chicken broth", "6 cups"],
+      ["Spinach", "3 cups"],
+      ["Italian seasoning", "1 tbsp"]
+    ],
+
+    directions: [
+      ["Sauté the vegetables",
+       "Cook diced onion, carrots, and celery in olive oil until softened."],
+
+      ["Simmer",
+       "Add broth, beans, seasoning, and chicken. Simmer until chicken is cooked through."],
+
+      ["Shred the chicken",
+       "Remove chicken, shred with two forks, and return it to the pot."],
+
+      ["Finish",
+       "Stir in spinach and simmer until wilted."]
+    ]
+  }
+
 ];
-const days=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-let state=JSON.parse(localStorage.getItem("ourTable")||"null")||{
- meals:seedMeals, week:{Monday:"1",Tuesday:"2",Wednesday:"3",Thursday:null,Friday:"4",Saturday:"5",Sunday:"6"},
- grocery:{}, pantry:[], history:[]
+
+
+/*
+==================================================
+WEEKLY PLAN
+==================================================
+*/
+
+const defaultWeek = {
+
+  Monday: "hidden-veggie-pasta",
+  Tuesday: "black-bean-bowls",
+  Wednesday: "leftovers",
+  Thursday: "mediterranean-chickpea-pitas",
+  Friday: "pizza-night",
+  Saturday: "coconut-shrimp",
+  Sunday: "chicken-white-bean-soup"
+
 };
-function save(){localStorage.setItem("ourTable",JSON.stringify(state))}
-function meal(id){return state.meals.find(m=>m.id===id)}
-function render(view="week"){
- document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===view));
- const main=document.getElementById("main");
- if(view==="week") main.innerHTML=weekHTML();
- if(view==="meals") main.innerHTML=mealsHTML();
- if(view==="grocery") main.innerHTML=groceryHTML();
- if(view==="pantry") main.innerHTML=pantryHTML();
- if(view==="history") main.innerHTML=historyHTML();
+
+
+/*
+==================================================
+LOCAL STORAGE
+==================================================
+*/
+
+function loadRecipes() {
+
+  const saved =
+    localStorage.getItem("ourTableRecipes");
+
+  if (saved) {
+    return JSON.parse(saved);
+  }
+
+  localStorage.setItem(
+    "ourTableRecipes",
+    JSON.stringify(defaultRecipes)
+  );
+
+  return [...defaultRecipes];
 }
-function weekHTML(){
- return `<div class="section-head"><div><h1>This Week</h1><div class="sub">Choose meals for each day.</div></div><button class="btn primary" onclick="copyLastWeek()">Copy last week</button></div>
- <div class="week">${days.map(d=>{let m=meal(state.week[d]);return `<div class="card day">
- <div class="dayname">${d}</div>${m?`<div class="meal-title">${m.name}</div><div>${m.tags.map(t=>`<span class="pill">${t}</span>`).join("")}</div><div class="actions"><button class="btn" onclick="openMeal('${m.id}')">Recipe</button><button class="btn ghost" onclick="chooseMeal('${d}')">Change</button><button class="btn ghost danger" onclick="removeDay('${d}')">Remove</button></div>`:`<div class="empty">No meal planned</div><button class="btn" onclick="chooseMeal('${d}')">＋ Add meal</button>`}
- </div>`}).join("")}</div>`;
+
+
+function loadWeek() {
+
+  const saved =
+    localStorage.getItem("ourTableWeek");
+
+  if (saved) {
+    return JSON.parse(saved);
+  }
+
+  localStorage.setItem(
+    "ourTableWeek",
+    JSON.stringify(defaultWeek)
+  );
+
+  return {...defaultWeek};
 }
-function mealsHTML(){
- return `<div class="section-head"><div><h1>Meals</h1><div class="sub">${state.meals.length} meals in your library</div></div><button class="btn primary" onclick="editMeal()">＋ Add meal</button></div>
- <div class="meal-grid">${state.meals.map(m=>`<div class="card meal-card"><button class="star" onclick="toggleFav('${m.id}')">${m.favorite?"★":"☆"}</button><h2>${m.name}</h2><div>${m.tags.map(t=>`<span class="pill">${t}</span>`).join("")}</div><div class="meta">${m.ingredients.length} ingredients</div><div class="actions"><button class="btn" onclick="openMeal('${m.id}')">Open</button><button class="btn" onclick="editMeal('${m.id}')">Edit</button></div></div>`).join("")}</div>`;
+
+
+let recipes = loadRecipes();
+let week = loadWeek();
+
+
+function saveAll() {
+
+  localStorage.setItem(
+    "ourTableRecipes",
+    JSON.stringify(recipes)
+  );
+
+  localStorage.setItem(
+    "ourTableWeek",
+    JSON.stringify(week)
+  );
 }
-function groceryHTML(){
- let groups={}; Object.values(state.week).forEach(id=>{let m=meal(id);if(m)m.ingredients.forEach(([n,q,u,c])=>{let k=n.toLowerCase();if(!groups[k])groups[k]={name:n,q:0,unit:u,cat:c};groups[k].q+=Number(q)||0})});
- Object.entries(state.grocery).forEach(([k,v])=>{if(!groups[k])groups[k]={name:v.name,q:v.q||"",unit:v.unit||"",cat:v.cat||"Other",manual:true}});
- const cats={};Object.entries(groups).forEach(([k,v])=>(cats[v.cat]??=[]).push([k,v]));
- return `<div class="section-head"><div><h1>Grocery</h1><div class="sub">Generated from this week's meals</div></div><button class="btn primary" onclick="addGrocery()">＋ Add item</button></div>
- ${Object.entries(cats).map(([cat,items])=>`<div class="category">${cat}</div><div class="list">${items.map(([k,v])=>{let checked=state.grocery[k]?.checked;return `<div class="card item ${checked?"done":""}"><input type="checkbox" ${checked?"checked":""} onchange="checkGrocery('${k}',this.checked)"><span>${v.q?`${v.q} ${v.unit} `:""}${v.name}</span>${v.manual?`<button class="btn ghost" style="margin-left:auto" onclick="deleteGrocery('${k}')">×</button>`:""}</div>`}).join("")}</div>`).join("")}`;
+
+
+/*
+==================================================
+WEEK VIEW
+==================================================
+*/
+
+function renderWeek() {
+
+  const days = [
+    ["Monday", "Oct 5"],
+    ["Tuesday", "Oct 6"],
+    ["Wednesday", "Oct 7"],
+    ["Thursday", "Oct 8"],
+    ["Friday", "Oct 9"],
+    ["Saturday", "Oct 10"],
+    ["Sunday", "Oct 11"]
+  ];
+
+  const list =
+    document.getElementById("mealList");
+
+  list.innerHTML = days.map(day => {
+
+    const recipe =
+      recipes.find(r => r.id === week[day[0]]);
+
+    if (!recipe) {
+
+      return `
+        <button class="meal-card"
+          onclick="showRecipesForDay('${day[0]}')">
+
+          <div class="day">
+            ${day[0].slice(0,3)}
+            <span class="day-number">
+              ${day[1].slice(4)}
+            </span>
+          </div>
+
+          <div>
+            <div class="meal-name">
+              Choose a recipe
+            </div>
+
+            <div class="meal-description">
+              Tap to select from your recipe box
+            </div>
+          </div>
+
+          <div class="arrow">›</div>
+
+        </button>
+      `;
+    }
+
+    return `
+      <button
+        class="meal-card"
+        onclick="openRecipe('${recipe.id}')"
+      >
+
+        <div class="day">
+          ${day[0].slice(0,3)}
+          <span class="day-number">
+            ${day[1].slice(4)}
+          </span>
+        </div>
+
+        <div>
+
+          <div class="meal-name">
+            ${recipe.name}
+          </div>
+
+          <div class="meal-description">
+            ${recipe.description || ""}
+          </div>
+
+        </div>
+
+        <div class="arrow">›</div>
+
+      </button>
+    `;
+
+  }).join("");
+
 }
-function pantryHTML(){
- return `<div class="section-head"><div><h1>Pantry</h1><div class="sub">Keep a simple inventory of what you already have.</div></div><button class="btn primary" onclick="addPantry()">＋ Add item</button></div>
- <div class="list">${state.pantry.length?state.pantry.map((p,i)=>`<div class="card item"><span><b>${p.name}</b><br><small class="meta">${p.q} ${p.unit} · ${p.cat}</small></span><button class="btn ghost" style="margin-left:auto" onclick="deletePantry(${i})">×</button></div>`).join(""):`<div class="empty">Your pantry is empty.</div>`}</div>`;
+
+
+/*
+==================================================
+RECIPE BOX
+==================================================
+*/
+
+function renderRecipeBox() {
+
+  const list =
+    document.getElementById("recipeBoxList");
+
+  if (!recipes.length) {
+
+    list.innerHTML = `
+      <div class="empty">
+        Your recipe box is empty.
+      </div>
+    `;
+
+    return;
+  }
+
+  list.innerHTML =
+    recipes.map(recipe => {
+
+      return `
+        <button
+          class="recipe-box-card"
+          onclick="openRecipe('${recipe.id}')"
+        >
+
+          <div class="recipe-box-name">
+            ${recipe.name}
+          </div>
+
+          <div class="recipe-box-meta">
+            ${recipe.time || "Recipe"} ·
+            ${recipe.servings
+              ? `serves ${recipe.servings}`
+              : "saved recipe"}
+          </div>
+
+        </button>
+      `;
+
+    }).join("");
+
 }
-function historyHTML(){
- return `<h1>History</h1><div class="sub">Meals are recorded when you save a weekly plan.</div><div class="list" style="margin-top:15px">${state.history.length?state.history.slice().reverse().map(h=>`<div class="card item"><span><b>${h.name}</b><br><small class="meta">${h.date}</small></span></div>`).join(""):`<div class="empty">No meal history yet.</div>`}</div>`;
+
+
+/*
+==================================================
+RECIPE DETAIL
+==================================================
+*/
+
+function openRecipe(id) {
+
+  const recipe =
+    recipes.find(r => r.id === id);
+
+  if (!recipe) return;
+
+  const content =
+    document.getElementById("recipeContent");
+
+  content.innerHTML = `
+
+    <div class="detail-kicker">
+      Recipe
+    </div>
+
+    <h1 class="detail-title">
+      ${recipe.name}
+    </h1>
+
+    <p class="detail-description">
+      ${recipe.description || ""}
+    </p>
+
+    <div class="recipe-meta">
+
+      ${recipe.time
+        ? `<span>${recipe.time}</span>`
+        : ""}
+
+      ${recipe.servings
+        ? `<span>Serves ${recipe.servings}</span>`
+        : ""}
+
+    </div>
+
+
+    <div class="recipe-section">
+
+      <h2>Ingredients</h2>
+
+      <ul class="ingredients">
+
+        ${(recipe.ingredients || [])
+          .map(item => `
+
+            <li>
+              <span>${item[0]}</span>
+              <span>${item[1]}</span>
+            </li>
+
+          `).join("")}
+
+      </ul>
+
+    </div>
+
+
+    <div class="recipe-section">
+
+      <h2>Directions</h2>
+
+      <ol class="directions">
+
+        ${(recipe.directions || [])
+          .map(step => `
+
+            <li>
+
+              <strong>
+                ${step[0]}
+              </strong>
+
+              ${step[1]}
+
+            </li>
+
+          `).join("")}
+
+      </ol>
+
+    </div>
+
+
+    <div class="assign-box">
+
+      <label>
+        Add this recipe to your week
+      </label>
+
+      <div class="assign-row">
+
+        <select
+          id="assignDay"
+          class="day-select"
+        >
+
+          <option>Monday</option>
+          <option>Tuesday</option>
+          <option>Wednesday</option>
+          <option>Thursday</option>
+          <option>Friday</option>
+          <option>Saturday</option>
+          <option>Sunday</option>
+
+        </select>
+
+        <button
+          class="primary-button"
+          onclick="assignRecipe('${recipe.id}')"
+        >
+          Add
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+  showView("recipe");
+
 }
-function chooseMeal(day){
- let choices=state.meals.map(m=>`<button class="btn" style="width:100%;text-align:left;margin:4px 0" onclick="setDay('${day}','${m.id}')">${m.favorite?"★ ":""}${m.name}</button>`).join("");
- show(`<h2>Choose a meal for ${day}</h2>${choices}<button class="btn" onclick="closeModal()">Cancel</button>`);
+
+
+/*
+==================================================
+ASSIGN RECIPE TO DAY
+==================================================
+*/
+
+function assignRecipe(id) {
+
+  const day =
+    document.getElementById("assignDay").value;
+
+  week[day] = id;
+
+  saveAll();
+
+  renderWeek();
+  renderGrocery();
+
+  showView("week");
+
 }
-function setDay(day,id){let old=meal(state.week[day]);state.week[day]=id;let m=meal(id);if(m)state.history.push({name:m.name,date:new Date().toLocaleDateString()});save();closeModal();render("week")}
-function removeDay(day){state.week[day]=null;save();render("week")}
-function openMeal(id){
- let m=meal(id); if(m.url){window.open(m.url,"_blank");return}
- show(`<h2>${m.name}</h2><div>${m.tags.map(t=>`<span class="pill">${t}</span>`).join("")}</div><h3>Ingredients</h3><div class="list">${m.ingredients.map(([n,q,u])=>`<div class="item">${q} ${u} ${n}</div>`).join("")}</div>${m.notes?`<h3>Notes</h3><p>${m.notes}</p>`:""}<button class="btn" onclick="closeModal()">Close</button>`);
+
+
+/*
+==================================================
+GROCERY LIST
+==================================================
+
+The grocery list is generated from the recipes
+currently assigned to the week.
+
+This means imported recipes automatically
+become part of the grocery list when assigned.
+*/
+
+function renderGrocery() {
+
+  const container =
+    document.getElementById("groceryList");
+
+  const ingredients = {};
+
+  Object.values(week).forEach(recipeId => {
+
+    const recipe =
+      recipes.find(r => r.id === recipeId);
+
+    if (!recipe) return;
+
+    (recipe.ingredients || []).forEach(item => {
+
+      const name = item[0];
+      const quantity = item[1];
+
+      if (!ingredients[name]) {
+        ingredients[name] = [];
+      }
+
+      ingredients[name].push(quantity);
+
+    });
+
+  });
+
+
+  if (!Object.keys(ingredients).length) {
+
+    container.innerHTML = `
+      <div class="empty">
+        Add some recipes to your week and your grocery list
+        will appear here.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  /*
+  For now we keep quantities visible separately
+  rather than incorrectly adding things like
+  "1 carrot" + "2 carrots."
+
+  A later ingredient-normalization layer can
+  intelligently combine quantities.
+  */
+
+  container.innerHTML = `
+
+    <div class="grocery-group">
+
+      <h2>Everything we need</h2>
+
+      ${Object.entries(ingredients)
+        .map(([name, quantities], index) => {
+
+          return `
+
+            <label class="grocery-item">
+
+              <input
+                type="checkbox"
+                data-grocery="${index}"
+              >
+
+              <span>
+                ${quantities.join(" + ")} ${name}
+              </span>
+
+            </label>
+
+          `;
+
+        }).join("")}
+
+    </div>
+
+  `;
+
 }
-function editMeal(id){
- let m=id?meal(id):{id:"m"+Date.now(),name:"",url:"",ingredients:[],notes:"",favorite:false,tags:[]};
- show(`<h2>${id?"Edit":"Add"} meal</h2><div class="form">
- <div class="field"><label>Name</label><input id="mn" value="${esc(m.name)}"></div>
- <div class="field"><label>Recipe URL (optional)</label><input id="mu" value="${esc(m.url)}" placeholder="https://..."></div>
- <div class="field"><label>Ingredients</label><textarea id="mi" placeholder="One ingredient per line, e.g. 2 | cans | black beans | Pantry">${m.ingredients.map(x=>x.join(" | ")).join("\\n")}</textarea><small class="meta">Format: quantity | unit | ingredient | category</small></div>
- <div class="field"><label>Tags (comma separated)</label><input id="mt" value="${esc(m.tags.join(", "))}"></div>
- <div class="field"><label>Notes / recipe</label><textarea id="mo">${esc(m.notes)}</textarea></div>
- <div class="actions"><button class="btn primary" onclick="saveMeal('${m.id}',${!!id})">Save meal</button><button class="btn" onclick="closeModal()">Cancel</button>${id?`<button class="btn danger" onclick="deleteMeal('${m.id}')">Delete</button>`:""}</div></div>`);
+
+
+/*
+==================================================
+IMPORT PLACEHOLDER
+==================================================
+
+The actual URL importer will call our backend.
+
+The backend will return a recipe object
+in this format:
+
+{
+  name,
+  description,
+  time,
+  servings,
+  ingredients: [
+    ["ingredient", "quantity"]
+  ],
+  directions: [
+    ["step title", "instructions"]
+  ]
 }
-function saveMeal(id,existing){
- let lines=document.getElementById("mi").value.split("\n").map(s=>s.trim()).filter(Boolean);
- let ingredients=lines.map(line=>{let p=line.split("|").map(x=>x.trim());return [p[2]||p[0],p[0]&&p[2]?p[0]:"1",p[1]||"",p[3]||"Other"]});
- let m={id,name:document.getElementById("mn").value.trim()||"Untitled meal",url:document.getElementById("mu").value.trim(),ingredients,notes:document.getElementById("mo").value,tags:document.getElementById("mt").value.split(",").map(x=>x.trim()).filter(Boolean),favorite:existing?meal(id).favorite:false};
- if(existing){let i=state.meals.findIndex(x=>x.id===id);state.meals[i]=m}else state.meals.push(m);
- save();closeModal();render("meals");
+
+Once returned, it gets saved into recipes[]
+and therefore becomes part of the Recipe Box.
+
+*/
+
+async function importRecipe() {
+
+  const input =
+    document.getElementById("recipeUrl");
+
+  const url =
+    input.value.trim();
+
+  if (!url) {
+
+    alert("Paste a recipe URL first.");
+
+    return;
+  }
+
+
+  /*
+  BACKEND CONNECTION GOES HERE.
+
+  Example:
+
+  const response = await fetch(
+    "YOUR-CLOUDFLARE-WORKER-URL",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ url })
+    }
+  );
+
+  const importedRecipe =
+    await response.json();
+
+  saveImportedRecipe(importedRecipe);
+  */
+
+
+  alert(
+    "The recipe importer is the next piece we'll connect. " +
+    "Your Recipe Box is already set up to save imported recipes."
+  );
+
 }
-function deleteMeal(id){state.meals=state.meals.filter(m=>m.id!==id);Object.keys(state.week).forEach(d=>{if(state.week[d]===id)state.week[d]=null});save();closeModal();render("meals")}
-function toggleFav(id){let m=meal(id);m.favorite=!m.favorite;save();render("meals")}
-function addGrocery(){show(`<h2>Add grocery item</h2><div class="form"><div class="field"><label>Item</label><input id="gn"></div><div class="grid2"><div class="field"><label>Quantity</label><input id="gq"></div><div class="field"><label>Unit</label><input id="gu"></div></div><div class="field"><label>Category</label><input id="gc" value="Other"></div><button class="btn primary" onclick="saveGrocery()">Add</button><button class="btn" onclick="closeModal()">Cancel</button></div>`)}
-function saveGrocery(){let n=document.getElementById("gn").value.trim();if(!n)return;let k=n.toLowerCase();state.grocery[k]={name:n,q:document.getElementById("gq").value,unit:document.getElementById("gu").value,cat:document.getElementById("gc").value,manual:true};save();closeModal();render("grocery")}
-function checkGrocery(k,v){state.grocery[k]??={name:k,manual:false};state.grocery[k].checked=v;save();render("grocery")}
-function deleteGrocery(k){delete state.grocery[k];save();render("grocery")}
-function addPantry(){show(`<h2>Add pantry item</h2><div class="form"><div class="field"><label>Item</label><input id="pn"></div><div class="grid2"><div class="field"><label>Quantity</label><input id="pq"></div><div class="field"><label>Unit</label><input id="pu"></div></div><div class="field"><label>Category</label><input id="pc" value="Pantry"></div><button class="btn primary" onclick="savePantry()">Add</button><button class="btn" onclick="closeModal()">Cancel</button></div>`)}
-function savePantry(){let n=document.getElementById("pn").value.trim();if(!n)return;state.pantry.push({name:n,q:document.getElementById("pq").value,unit:document.getElementById("pu").value,cat:document.getElementById("pc").value});save();closeModal();render("pantry")}
-function deletePantry(i){state.pantry.splice(i,1);save();render("pantry")}
-function copyLastWeek(){alert("Week-copy will be connected once shared persistence is configured.")}
-function show(content){document.getElementById("modalBox").innerHTML=content;document.getElementById("modal").classList.remove("hidden")}
-function closeModal(){document.getElementById("modal").classList.add("hidden")}
-function esc(s){return String(s||"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll('"',"&quot;")}
-document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>render(b.dataset.view));
-document.getElementById("modal").onclick=e=>{if(e.target.id==="modal")closeModal()};
-render();
+
+
+/*
+==================================================
+SAVE IMPORTED RECIPE
+==================================================
+
+This function is ready for the backend.
+
+When the importer returns a recipe,
+this is all we need to save it.
+*/
+
+function saveImportedRecipe(importedRecipe) {
+
+  /*
+  Give imported recipes their own permanent ID.
+  */
+
+  const id =
+    "recipe-" +
+    Date.now();
+
+
+  const recipe = {
+
+    id: id,
+
+    name: importedRecipe.name,
+
+    description:
+      importedRecipe.description || "",
+
+    time:
+      importedRecipe.time || "",
+
+    servings:
+      importedRecipe.servings || "",
+
+    ingredients:
+      importedRecipe.ingredients || [],
+
+    directions:
+      importedRecipe.directions || [],
+
+    sourceUrl:
+      importedRecipe.sourceUrl || ""
+
+  };
+
+
+  recipes.push(recipe);
+
+  saveAll();
+
+  renderRecipeBox();
+
+  /*
+  Immediately open the newly imported recipe.
+  */
+
+  openRecipe(id);
+
+}
+
+
+/*
+==================================================
+VIEW NAVIGATION
+==================================================
+*/
+
+function showView(view) {
+
+  document
+    .querySelectorAll(".view")
+    .forEach(section => {
+      section.classList.remove("active");
+    });
+
+
+  if (view === "week") {
+
+    document
+      .getElementById("weekView")
+      .classList.add("active");
+
+  }
+
+
+  if (view === "recipes") {
+
+    document
+      .getElementById("recipesView")
+      .classList.add("active");
+
+  }
+
+
+  if (view === "grocery") {
+
+    document
+      .getElementById("groceryView")
+      .classList.add("active");
+
+  }
+
+
+  if (view === "recipe") {
+
+    document
+      .getElementById("recipeView")
+      .classList.add("active");
+
+  }
+
+
+  document
+    .querySelectorAll(".nav-button")
+    .forEach(button => {
+      button.classList.remove("active");
+    });
+
+
+  if (view === "week") {
+
+    document
+      .getElementById("weekNav")
+      .classList.add("active");
+
+  }
+
+
+  if (view === "recipes") {
+
+    document
+      .getElementById("recipesNav")
+      .classList.add("active");
+
+  }
+
+
+  if (view === "grocery") {
+
+    document
+      .getElementById("groceryNav")
+      .classList.add("active");
+
+  }
+
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+}
+
+
+/*
+==================================================
+INITIALIZE
+==================================================
+*/
+
+renderWeek();
+renderRecipeBox();
+renderGrocery();
+
 </script>
+
 </body>
 </html>
