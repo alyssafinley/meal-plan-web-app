@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f5f1e8">
+<title>Our Table</title>
+<style>
+:root{
+  --bg:#f6f2e9; --surface:#fffdf8; --ink:#292821; --muted:#777267;
+  --sage:#66745d; --sage-dark:#4e5d47; --terracotta:#a9634e; --line:#ddd6c8;
+  --shadow:0 8px 28px rgba(45,39,29,.08); --radius:18px;
+}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);
+font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,textarea,select{font:inherit} button{cursor:pointer}
+.app{max-width:900px;margin:auto;padding:18px 16px 92px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.brand{font-family:Georgia,serif;font-size:30px}.sub{color:var(--muted);font-size:13px}
+nav{position:fixed;z-index:10;bottom:0;left:0;right:0;background:rgba(255,253,248,.96);
+border-top:1px solid var(--line);display:flex;justify-content:center;backdrop-filter:blur(10px)}
+nav button{border:0;background:none;padding:12px 18px;color:var(--muted);font-size:12px}
+nav button.active{color:var(--sage-dark);font-weight:700}
+h1,h2,h3{font-family:Georgia,serif;font-weight:500}.section-head{display:flex;justify-content:space-between;align-items:center}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.week{display:grid;gap:10px}
+.day{padding:15px}.dayname{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.meal-title{font-family:Georgia,serif;font-size:21px;margin:5px 0}
+.meta{font-size:12px;color:var(--muted)}
+.empty{color:var(--muted);padding:10px 0}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 14px}
+.btn.primary{background:var(--sage-dark);color:white;border-color:var(--sage-dark)}
+.btn.ghost{background:transparent}.btn.danger{color:#9a493d}
+.list{display:grid;gap:8px}.item{display:flex;align-items:center;gap:10px;padding:12px 14px}
+.item input[type=checkbox]{width:19px;height:19px;accent-color:var(--sage)}
+.item.done span{text-decoration:line-through;color:var(--muted)}
+.category{margin-top:18px;color:var(--sage-dark);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.form{display:grid;gap:12px}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+.field input,.field textarea,.field select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}
+textarea{min-height:90px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.meal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.meal-card{padding:16px}.star{border:0;background:none;font-size:20px;float:right}
+.hidden{display:none!important}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#ece8dd;color:var(--sage-dark);font-size:11px;margin:3px 3px 0 0}
+.modal{position:fixed;inset:0;background:rgba(35,31,24,.45);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.modal-box{background:var(--surface);width:min(680px,100%);max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:20px}
+@media(min-width:700px){.app{padding-bottom:30px}.week{grid-template-columns:1fr 1fr}.day:last-child{grid-column:span 2}nav{position:sticky;top:0;border:0;justify-content:flex-start;margin:0 -16px 20px}.modal{align-items:center}.modal-box{border-radius:24px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div><div class="brand">Our Table</div><div class="sub">Meals, recipes & groceries</div></div></header>
+<nav id="nav">
+<button data-view="week" class="active">This Week</button>
+<button data-view="meals">Meals</button>
+<button data-view="grocery">Grocery</button>
+<button data-view="pantry">Pantry</button>
+<button data-view="history">History</button>
+</nav>
+<main id="main"></main>
+</div>
+<div id="modal" class="modal hidden"><div class="modal-box" id="modalBox"></div></div>
+<script>
+const seedMeals=[
+ {id:"1",name:"Hidden Veggie Pasta",url:"",ingredients:[["pasta","1","box","Pantry"],["marinara sauce","1","jar","Pantry"],["zucchini","1","each","Produce"]],notes:"A simple family favorite.",favorite:true,tags:["Vegetarian"]},
+ {id:"2",name:"Black Bean & Sweet Potato Bowls",url:"",ingredients:[["black beans","2","cans","Pantry"],["sweet potatoes","3","each","Produce"],["avocado","2","each","Produce"],["lime","2","each","Produce"]],notes:"Serve components separately for easy customization.",favorite:false,tags:["Vegetarian","Quick"]},
+ {id:"3",name:"Mediterranean Chickpea Pitas",url:"",ingredients:[["chickpeas","2","cans","Pantry"],["pitas","1","package","Pantry"],["cucumber","1","each","Produce"],["feta","4","oz","Refrigerated"]],notes:"",favorite:true,tags:["Vegetarian"]},
+ {id:"4",name:"Pizza Night",url:"",ingredients:[["pizza","1","","Frozen"]],notes:"",favorite:true,tags:["Easy"]},
+ {id:"5",name:"Coconut Shrimp",url:"",ingredients:[["shrimp","1","lb","Frozen"],["coconut milk","1","can","Pantry"],["garlic","3","cloves","Produce"]],notes:"",favorite:false,tags:["Seafood"]},
+ {id:"6",name:"Chicken & White Bean Soup",url:"",ingredients:[["chicken","1","lb","Refrigerated"],["white beans","2","cans","Pantry"],["carrots","3","each","Produce"],["celery","3","stalks","Produce"]],notes:"",favorite:false,tags:[]}
+];
+const days=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+let state=JSON.parse(localStorage.getItem("ourTable")||"null")||{
+ meals:seedMeals, week:{Monday:"1",Tuesday:"2",Wednesday:"3",Thursday:null,Friday:"4",Saturday:"5",Sunday:"6"},
+ grocery:{}, pantry:[], history:[]
+};
+function save(){localStorage.setItem("ourTable",JSON.stringify(state))}
+function meal(id){return state.meals.find(m=>m.id===id)}
+function render(view="week"){
+ document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===view));
+ const main=document.getElementById("main");
+ if(view==="week") main.innerHTML=weekHTML();
+ if(view==="meals") main.innerHTML=mealsHTML();
+ if(view==="grocery") main.innerHTML=groceryHTML();
+ if(view==="pantry") main.innerHTML=pantryHTML();
+ if(view==="history") main.innerHTML=historyHTML();
+}
+function weekHTML(){
+ return `<div class="section-head"><div><h1>This Week</h1><div class="sub">Choose meals for each day.</div></div><button class="btn primary" onclick="copyLastWeek()">Copy last week</button></div>
+ <div class="week">${days.map(d=>{let m=meal(state.week[d]);return `<div class="card day">
+ <div class="dayname">${d}</div>${m?`<div class="meal-title">${m.name}</div><div>${m.tags.map(t=>`<span class="pill">${t}</span>`).join("")}</div><div class="actions"><button class="btn" onclick="openMeal('${m.id}')">Recipe</button><button class="btn ghost" onclick="chooseMeal('${d}')">Change</button><button class="btn ghost danger" onclick="removeDay('${d}')">Remove</button></div>`:`<div class="empty">No meal planned</div><button class="btn" onclick="chooseMeal('${d}')">＋ Add meal</button>`}
+ </div>`}).join("")}</div>`;
+}
+function mealsHTML(){
+ return `<div class="section-head"><div><h1>Meals</h1><div class="sub">${state.meals.length} meals in your library</div></div><button class="btn primary" onclick="editMeal()">＋ Add meal</button></div>
+ <div class="meal-grid">${state.meals.map(m=>`<div class="card meal-card"><button class="star" onclick="toggleFav('${m.id}')">${m.favorite?"★":"☆"}</button><h2>${m.name}</h2><div>${m.tags.map(t=>`<span class="pill">${t}</span>`).join("")}</div><div class="meta">${m.ingredients.length} ingredients</div><div class="actions"><button class="btn" onclick="openMeal('${m.id}')">Open</button><button class="btn" onclick="editMeal('${m.id}')">Edit</button></div></div>`).join("")}</div>`;
+}
+function groceryHTML(){
+ let groups={}; Object.values(state.week).forEach(id=>{let m=meal(id);if(m)m.ingredients.forEach(([n,q,u,c])=>{let k=n.toLowerCase();if(!groups[k])groups[k]={name:n,q:0,unit:u,cat:c};groups[k].q+=Number(q)||0})});
+ Object.entries(state.grocery).forEach(([k,v])=>{if(!groups[k])groups[k]={name:v.name,q:v.q||"",unit:v.unit||"",cat:v.cat||"Other",manual:true}});
+ const cats={};Object.entries(groups).forEach(([k,v])=>(cats[v.cat]??=[]).push([k,v]));
+ return `<div class="section-head"><div><h1>Grocery</h1><div class="sub">Generated from this week's meals</div></div><button class="btn primary" onclick="addGrocery()">＋ Add item</button></div>
+ ${Object.entries(cats).map(([cat,items])=>`<div class="category">${cat}</div><div class="list">${items.map(([k,v])=>{let checked=state.grocery[k]?.checked;return `<div class="card item ${checked?"done":""}"><input type="checkbox" ${checked?"checked":""} onchange="checkGrocery('${k}',this.checked)"><span>${v.q?`${v.q} ${v.unit} `:""}${v.name}</span>${v.manual?`<button class="btn ghost" style="margin-left:auto" onclick="deleteGrocery('${k}')">×</button>`:""}</div>`}).join("")}</div>`).join("")}`;
+}
+function pantryHTML(){
+ return `<div class="section-head"><div><h1>Pantry</h1><div class="sub">Keep a simple inventory of what you already have.</div></div><button class="btn primary" onclick="addPantry()">＋ Add item</button></div>
+ <div class="list">${state.pantry.length?state.pantry.map((p,i)=>`<div class="card item"><span><b>${p.name}</b><br><small class="meta">${p.q} ${p.unit} · ${p.cat}</small></span><button class="btn ghost" style="margin-left:auto" onclick="deletePantry(${i})">×</button></div>`).join(""):`<div class="empty">Your pantry is empty.</div>`}</div>`;
+}
+function historyHTML(){
+ return `<h1>History</h1><div class="sub">Meals are recorded when you save a weekly plan.</div><div class="list" style="margin-top:15px">${state.history.length?state.history.slice().reverse().map(h=>`<div class="card item"><span><b>${h.name}</b><br><small class="meta">${h.date}</small></span></div>`).join(""):`<div class="empty">No meal history yet.</div>`}</div>`;
+}
+function chooseMeal(day){
+ let choices=state.meals.map(m=>`<button class="btn" style="width:100%;text-align:left;margin:4px 0" onclick="setDay('${day}','${m.id}')">${m.favorite?"★ ":""}${m.name}</button>`).join("");
+ show(`<h2>Choose a meal for ${day}</h2>${choices}<button class="btn" onclick="closeModal()">Cancel</button>`);
+}
+function setDay(day,id){let old=meal(state.week[day]);state.week[day]=id;let m=meal(id);if(m)state.history.push({name:m.name,date:new Date().toLocaleDateString()});save();closeModal();render("week")}
+function removeDay(day){state.week[day]=null;save();render("week")}
+function openMeal(id){
+ let m=meal(id); if(m.url){window.open(m.url,"_blank");return}
+ show(`<h2>${m.name}</h2><div>${m.tags.map(t=>`<span class="pill">${t}</span>`).join("")}</div><h3>Ingredients</h3><div class="list">${m.ingredients.map(([n,q,u])=>`<div class="item">${q} ${u} ${n}</div>`).join("")}</div>${m.notes?`<h3>Notes</h3><p>${m.notes}</p>`:""}<button class="btn" onclick="closeModal()">Close</button>`);
+}
+function editMeal(id){
+ let m=id?meal(id):{id:"m"+Date.now(),name:"",url:"",ingredients:[],notes:"",favorite:false,tags:[]};
+ show(`<h2>${id?"Edit":"Add"} meal</h2><div class="form">
+ <div class="field"><label>Name</label><input id="mn" value="${esc(m.name)}"></div>
+ <div class="field"><label>Recipe URL (optional)</label><input id="mu" value="${esc(m.url)}" placeholder="https://..."></div>
+ <div class="field"><label>Ingredients</label><textarea id="mi" placeholder="One ingredient per line, e.g. 2 | cans | black beans | Pantry">${m.ingredients.map(x=>x.join(" | ")).join("\\n")}</textarea><small class="meta">Format: quantity | unit | ingredient | category</small></div>
+ <div class="field"><label>Tags (comma separated)</label><input id="mt" value="${esc(m.tags.join(", "))}"></div>
+ <div class="field"><label>Notes / recipe</label><textarea id="mo">${esc(m.notes)}</textarea></div>
+ <div class="actions"><button class="btn primary" onclick="saveMeal('${m.id}',${!!id})">Save meal</button><button class="btn" onclick="closeModal()">Cancel</button>${id?`<button class="btn danger" onclick="deleteMeal('${m.id}')">Delete</button>`:""}</div></div>`);
+}
+function saveMeal(id,existing){
+ let lines=document.getElementById("mi").value.split("\n").map(s=>s.trim()).filter(Boolean);
+ let ingredients=lines.map(line=>{let p=line.split("|").map(x=>x.trim());return [p[2]||p[0],p[0]&&p[2]?p[0]:"1",p[1]||"",p[3]||"Other"]});
+ let m={id,name:document.getElementById("mn").value.trim()||"Untitled meal",url:document.getElementById("mu").value.trim(),ingredients,notes:document.getElementById("mo").value,tags:document.getElementById("mt").value.split(",").map(x=>x.trim()).filter(Boolean),favorite:existing?meal(id).favorite:false};
+ if(existing){let i=state.meals.findIndex(x=>x.id===id);state.meals[i]=m}else state.meals.push(m);
+ save();closeModal();render("meals");
+}
+function deleteMeal(id){state.meals=state.meals.filter(m=>m.id!==id);Object.keys(state.week).forEach(d=>{if(state.week[d]===id)state.week[d]=null});save();closeModal();render("meals")}
+function toggleFav(id){let m=meal(id);m.favorite=!m.favorite;save();render("meals")}
+function addGrocery(){show(`<h2>Add grocery item</h2><div class="form"><div class="field"><label>Item</label><input id="gn"></div><div class="grid2"><div class="field"><label>Quantity</label><input id="gq"></div><div class="field"><label>Unit</label><input id="gu"></div></div><div class="field"><label>Category</label><input id="gc" value="Other"></div><button class="btn primary" onclick="saveGrocery()">Add</button><button class="btn" onclick="closeModal()">Cancel</button></div>`)}
+function saveGrocery(){let n=document.getElementById("gn").value.trim();if(!n)return;let k=n.toLowerCase();state.grocery[k]={name:n,q:document.getElementById("gq").value,unit:document.getElementById("gu").value,cat:document.getElementById("gc").value,manual:true};save();closeModal();render("grocery")}
+function checkGrocery(k,v){state.grocery[k]??={name:k,manual:false};state.grocery[k].checked=v;save();render("grocery")}
+function deleteGrocery(k){delete state.grocery[k];save();render("grocery")}
+function addPantry(){show(`<h2>Add pantry item</h2><div class="form"><div class="field"><label>Item</label><input id="pn"></div><div class="grid2"><div class="field"><label>Quantity</label><input id="pq"></div><div class="field"><label>Unit</label><input id="pu"></div></div><div class="field"><label>Category</label><input id="pc" value="Pantry"></div><button class="btn primary" onclick="savePantry()">Add</button><button class="btn" onclick="closeModal()">Cancel</button></div>`)}
+function savePantry(){let n=document.getElementById("pn").value.trim();if(!n)return;state.pantry.push({name:n,q:document.getElementById("pq").value,unit:document.getElementById("pu").value,cat:document.getElementById("pc").value});save();closeModal();render("pantry")}
+function deletePantry(i){state.pantry.splice(i,1);save();render("pantry")}
+function copyLastWeek(){alert("Week-copy will be connected once shared persistence is configured.")}
+function show(content){document.getElementById("modalBox").innerHTML=content;document.getElementById("modal").classList.remove("hidden")}
+function closeModal(){document.getElementById("modal").classList.add("hidden")}
+function esc(s){return String(s||"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll('"',"&quot;")}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>render(b.dataset.view));
+document.getElementById("modal").onclick=e=>{if(e.target.id==="modal")closeModal()};
+render();
+</script>
+</body>
+</html>
