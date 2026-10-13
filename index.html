@@ -720,7 +720,6 @@ h2 {
 
 </nav>
 
-
 <script>
 
 /*
@@ -915,7 +914,7 @@ const defaultRecipes = [
        "Dip shrimp in flour, then egg, then coconut-panko mixture."],
 
       ["Cook",
-       "Air fry at 400°F for 8-10 minutes, turning halfway."],
+       "Air fry at 400°F for 8–10 minutes, turning halfway."],
 
       ["Serve",
        "Serve with rice and lime wedges."]
@@ -1024,7 +1023,6 @@ let week = loadWeek();
 
 
 function saveAll() {
-
   localStorage.setItem(
     "ourTableRecipes",
     JSON.stringify(recipes)
@@ -1036,142 +1034,525 @@ function saveAll() {
   );
 }
 
+
 /*
-... (rest of the original app code remains unchanged) ...
+==================================================
+WEEK VIEW
+==================================================
 */
 
-// The original app code continues; we will keep it intact until the end where we replace the final render calls and add the Supabase integration.
+function renderWeek() {
 
-// --- (CUT - rest of the app code preserved) ---
+  const days = [
+    ["Monday", "Oct 5"],
+    ["Tuesday", "Oct 6"],
+    ["Wednesday", "Oct 7"],
+    ["Thursday", "Oct 8"],
+    ["Friday", "Oct 9"],
+    ["Saturday", "Oct 10"],
+    ["Sunday", "Oct 11"]
+  ];
 
-</script>
+  const list = document.getElementById("mealList");
 
-<!-- Supabase client -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  list.innerHTML = days.map(day => {
 
-<script>
-/* Supabase integration added per request (keys provided by repository owner) */
-const SUPABASE_URL = 'https://agqpwjhtbxytllbnpgbo.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFncXB3amh0Ynh5dGxsYm5wZ2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MzkyNjEsImV4cCI6MjEwNzQxNTI2MX0.365rGPl6wFsh-e3zUUHU7GCsOU1FISsFMQAIm09lJpY';
-const HOUSEHOLD_ID = 'shared';
+    const recipe = recipes.find(r => r.id === week[day[0]]);
 
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    if (!recipe) {
 
-function saveAllLocal() {
-  localStorage.setItem("ourTableRecipes", JSON.stringify(recipes));
-  localStorage.setItem("ourTableWeek", JSON.stringify(week));
+      return `
+        <button class="meal-card"
+          onclick="showRecipesForDay('${day[0]}')">
+
+          <div class="day">
+            ${day[0].slice(0,3)}
+            <span class="day-number">
+              ${day[1].slice(4)}
+            </span>
+          </div>
+
+          <div>
+            <div class="meal-name">
+              Choose a recipe
+            </div>
+
+            <div class="meal-description">
+              Tap to select from your recipe box
+            </div>
+          </div>
+
+          <div class="arrow">›</div>
+
+        </button>
+      `;
+    }
+
+    return `
+      <button
+        class="meal-card"
+        onclick="openRecipe('${recipe.id}')"
+      >
+
+        <div class="day">
+          ${day[0].slice(0,3)}
+          <span class="day-number">
+            ${day[1].slice(4)}
+          </span>
+        </div>
+
+        <div>
+
+          <div class="meal-name">
+            ${recipe.name}
+          </div>
+
+          <div class="meal-description">
+            ${recipe.description || ""}
+          </div>
+
+        </div>
+
+        <div class="arrow">›</div>
+
+      </button>
+    `;
+
+  }).join("");
+
 }
 
-async function fetchRecipesFromSupabase() {
-  try {
-    const { data, error } = await supabaseClient.from('recipes').select('*');
-    if (error) throw error;
-    if (Array.isArray(data) && data.length) {
-      recipes = data.map(r => ({
-        id: r.id,
-        name: r.name,
-        description: r.description,
-        time: r.time,
-        servings: r.servings,
-        ingredients: r.ingredients || [],
-        directions: r.directions || [],
-        sourceUrl: r.source_url || ""
-      }));
-      saveAllLocal();
-    }
-  } catch (err) {
-    console.warn('Could not fetch recipes from Supabase; using local data.', err);
+
+/*
+==================================================
+RECIPE BOX
+==================================================
+*/
+
+function renderRecipeBox() {
+
+  const list = document.getElementById("recipeBoxList");
+
+  if (!recipes.length) {
+
+    list.innerHTML = `
+      <div class="empty">
+        Your recipe box is empty.
+      </div>
+    `;
+
+    return;
   }
-  renderRecipeBox();
+
+  list.innerHTML =
+    recipes.map(recipe => {
+
+      return `
+        <button
+          class="recipe-box-card"
+          onclick="openRecipe('${recipe.id}')"
+        >
+
+          <div class="recipe-box-name">
+            ${recipe.name}
+          </div>
+
+          <div class="recipe-box-meta">
+            ${recipe.time || "Recipe"} ·
+            ${recipe.servings
+              ? `serves ${recipe.servings}`
+              : "saved recipe"}
+          </div>
+
+        </button>
+      `;
+
+    }).join("");
+
 }
 
-async function fetchMealPlanFromSupabase() {
-  try {
-    const { data, error } = await supabaseClient
-      .from('meal_plan_entries')
-      .select('day,recipe_id')
-      .eq('household_id', HOUSEHOLD_ID);
 
-    if (error) throw error;
-    if (Array.isArray(data)) {
-      const serverWeek = { ...defaultWeek };
-      data.forEach(row => {
-        if (row.day && row.recipe_id) serverWeek[row.day] = row.recipe_id;
-      });
-      week = serverWeek;
-      saveAllLocal();
-    }
-  } catch (err) {
-    console.warn('Could not fetch meal plan from Supabase; using local week.', err);
-  }
+/*
+==================================================
+RECIPE DETAIL
+==================================================
+*/
+
+function openRecipe(id) {
+
+  const recipe = recipes.find(r => r.id === id);
+
+  if (!recipe) return;
+
+  document.getElementById("recipeContent").innerHTML = `
+
+    <div class="detail-kicker">
+      Recipe
+    </div>
+
+    <h2 class="detail-title">${recipe.name}</h2>
+
+    ${recipe.description ? `
+      <div class="detail-description">
+        ${recipe.description}
+      </div>
+    ` : ""}
+
+    <div class="recipe-meta">
+      ${recipe.time ? `<span>${recipe.time}</span>` : ""}
+      ${recipe.servings ? `<span>Serves ${recipe.servings}</span>` : ""}
+    </div>
+
+    <div class="recipe-section">
+      <h2>Ingredients</h2>
+
+      <ul class="ingredients">
+
+        ${(recipe.ingredients || [])
+          .map(item => `
+
+            <li>
+              <span>${item[0]}</span>
+              <span>${item[1]}</span>
+            </li>
+
+          `).join("")}
+
+      </ul>
+
+    </div>
+
+
+    <div class="recipe-section">
+
+      <h2>Directions</h2>
+
+      <ol class="directions">
+
+        ${(recipe.directions || [])
+          .map(step => `
+
+            <li>
+
+              <strong>
+                ${step[0]}
+              </strong>
+
+              ${step[1]}
+
+            </li>
+
+          `).join("")}
+
+      </ol>
+
+    </div>
+
+
+    <div class="assign-box">
+
+      <label>
+        Add this recipe to your week
+      </label>
+
+      <div class="assign-row">
+
+        <select
+          id="assignDay"
+          class="day-select"
+        >
+
+          <option>Monday</option>
+          <option>Tuesday</option>
+          <option>Wednesday</option>
+          <option>Thursday</option>
+          <option>Friday</option>
+          <option>Saturday</option>
+          <option>Sunday</option>
+
+        </select>
+
+        <button
+          class="primary-button"
+          onclick="assignRecipe('${recipe.id}')"
+        >
+          Add
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+  showView("recipe");
+
+}
+
+
+/*
+==================================================
+ASSIGN RECIPE TO DAY
+==================================================
+*/
+
+function assignRecipe(id) {
+
+  const day = document.getElementById("assignDay").value;
+
+  week[day] = id;
+
+  saveAll();
+
   renderWeek();
   renderGrocery();
+
+  showView("week");
+
 }
 
-function subscribeRealtime() {
-  const channel = supabaseClient.channel('public:meal_plan_entries');
-  channel.on(
-    'postgres_changes',
-    { event: '*', schema: 'public', table: 'meal_plan_entries', filter: `household_id=eq.${HOUSEHOLD_ID}` },
-    payload => {
-      console.log('Realtime payload', payload);
-      fetchMealPlanFromSupabase();
-    }
+
+/*
+==================================================
+GROCERY LIST
+==================================================
+
+The grocery list is generated from the recipes
+currently assigned to the week.
+
+This means imported recipes automatically
+become part of the grocery list when assigned.
+*/
+
+function renderGrocery() {
+
+  const container = document.getElementById("groceryList");
+
+  const ingredients = {};
+
+  Object.values(week).forEach(recipeId => {
+
+    const recipe = recipes.find(r => r.id === recipeId);
+
+    if (!recipe) return;
+
+    (recipe.ingredients || []).forEach(item => {
+
+      const name = item[0];
+      const quantity = item[1];
+
+      if (!ingredients[name]) {
+        ingredients[name] = [];
+      }
+
+      ingredients[name].push(quantity);
+
+    });
+
+  });
+
+
+  if (!Object.keys(ingredients).length) {
+
+    container.innerHTML = `
+      <div class="empty">
+        Add some recipes to your week and your grocery list
+        will appear here.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  container.innerHTML = `
+
+    <div class="grocery-group">
+
+      <h2>Everything we need</h2>
+
+      ${Object.entries(ingredients)
+        .map(([name, quantities], index) => {
+
+          return `
+
+            <label class="grocery-item">
+
+              <input
+                type="checkbox"
+                data-grocery="${index}"
+              >
+
+              <span>
+                ${quantities.join(" + ")} ${name}
+              </span>
+
+            </label>
+
+          `;
+
+        }).join("")}
+
+    </div>
+
+  `;
+
+}
+
+
+/*
+==================================================
+RECIPE IMPORT
+==================================================
+*/
+
+function importRecipe() {
+
+  const input =
+    document.getElementById("recipeUrl");
+
+  const url = input.value.trim();
+
+  if (!url) {
+    alert("Paste a recipe URL first.");
+    return;
+  }
+
+  alert(
+    "The recipe importer is the next piece we'll connect. " +
+    "Your Recipe Box is already set up to save imported recipes."
   );
-  channel.subscribe().catch(err => console.warn('realtime subscribe failed', err));
+
 }
 
-async function saveAll() {
-  // persist locally first
-  saveAllLocal();
 
-  try {
-    const days = Object.keys(week);
-    for (const day of days) {
-      const recipeId = week[day] || null;
-      const row = {
-        household_id: HOUSEHOLD_ID,
-        day,
-        recipe_id: recipeId
-      };
-      const { error } = await supabaseClient
-        .from('meal_plan_entries')
-        .upsert(row, { onConflict: ['household_id', 'day'] });
-      if (error) console.warn('meal_plan_entries upsert error', error);
-    }
+/*
+==================================================
+SAVE IMPORTED RECIPE
+==================================================
+*/
 
-    for (const r of recipes) {
-      const row = {
-        id: r.id,
-        name: r.name,
-        description: r.description || null,
-        time: r.time || null,
-        servings: r.servings || null,
-        ingredients: r.ingredients || [],
-        directions: r.directions || [],
-        source_url: r.sourceUrl || null
-      };
-      const { error } = await supabaseClient.from('recipes').upsert(row, { onConflict: 'id' });
-      if (error) console.warn('recipes upsert error', error);
-    }
-  } catch (err) {
-    console.warn('Supabase save failed — keeping changes locally.', err);
-  }
-}
+function saveImportedRecipe(importedRecipe) {
 
-async function initSync() {
-  recipes = loadRecipes();
-  week = loadWeek();
-  renderWeek();
+  const id = "recipe-" + Date.now();
+
+  const recipe = {
+    id: id,
+    name: importedRecipe.name,
+    description: importedRecipe.description || "",
+    time: importedRecipe.time || "",
+    servings: importedRecipe.servings || "",
+    ingredients: importedRecipe.ingredients || [],
+    directions: importedRecipe.directions || [],
+    sourceUrl: importedRecipe.sourceUrl || ""
+  };
+
+  recipes.push(recipe);
+
+  saveAll();
   renderRecipeBox();
-  renderGrocery();
 
-  await Promise.all([fetchRecipesFromSupabase(), fetchMealPlanFromSupabase()]);
+  openRecipe(id);
 
-  subscribeRealtime();
 }
 
-initSync();
+
+/*
+==================================================
+VIEW NAVIGATION
+==================================================
+*/
+
+function showView(view) {
+
+  document
+    .querySelectorAll(".view")
+    .forEach(section => {
+      section.classList.remove("active");
+    });
+
+
+  if (view === "week") {
+    document.getElementById("weekView").classList.add("active");
+  }
+
+  if (view === "recipes") {
+    document.getElementById("recipesView").classList.add("active");
+  }
+
+  if (view === "grocery") {
+    document.getElementById("groceryView").classList.add("active");
+  }
+
+  if (view === "recipe") {
+    document.getElementById("recipeView").classList.add("active");
+  }
+
+  document
+    .querySelectorAll(".nav-button")
+    .forEach(button => {
+      button.classList.remove("active");
+    });
+
+  if (view === "week") {
+    document.getElementById("weekNav").classList.add("active");
+  }
+
+  if (view === "recipes") {
+    document.getElementById("recipesNav").classList.add("active");
+  }
+
+  if (view === "grocery") {
+    document.getElementById("groceryNav").classList.add("active");
+  }
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+}
+
+
+/*
+==================================================
+INITIALIZE
+==================================================
+*/
+
+renderWeek();
+renderRecipeBox();
+renderGrocery();
+
+(function fixWeekSubtitle() {
+  const subtitle = document.querySelector('#weekView .page-subtitle');
+  if (!subtitle) return;
+
+  const now = new Date();
+  const day = now.getDay();
+  const mondayOffset = (day === 0) ? -6 : (1 - day);
+  const monday = new Date(now);
+  monday.setDate(now.getDate() + mondayOffset);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+
+  const fmt = (date) => date.toLocaleString('en-US', { month: 'short' });
+  const range = `${fmt(monday)} ${monday.getDate()} — ${fmt(sunday)} ${sunday.getDate()}`;
+  subtitle.textContent = range;
+})();
+
+(function ensureNavHandler() {
+  const navMap = {
+    'weekNav': 'week',
+    'recipesNav': 'recipes',
+    'groceryNav': 'grocery'
+  };
+
+  Object.entries(navMap).forEach(([id, view]) => {
+    const el = document.getElementById(id);
+    if (!el || el.dataset.navBound === 'true') return;
+    el.addEventListener('click', () => showView(view));
+    el.dataset.navBound = 'true';
+  });
+})();
+
 </script>
 
 </body>
