@@ -720,458 +720,259 @@ h2 {
 
 </nav>
 
+<!-- Supabase client (optional) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Create a local file named `supabase-config.js` with your SUPABASE_URL and SUPABASE_ANON_KEY constants to enable cloud sync. See supabase-config.example.js -->
+<script src="supabase-config.js"></script>
 
 <script>
 
 /*
-==================================================
+=================================================
 OUR TABLE DATA
-==================================================
-
-Important:
-Recipes are stored separately from the weekly plan.
-
-That means a recipe can live in the Recipe Box
-without being assigned to a particular week.
-
-The weekly plan simply references recipe IDs.
-
-This is the structure the URL importer will use.
+=================================================
 */
-
 
 const defaultRecipes = [
-
-  {
-    id: "hidden-veggie-pasta",
-    name: "Hidden Veggie Pasta",
-    description: "creamy marinara · roasted vegetables · parmesan",
-    time: "35 min",
-    servings: "4",
-
-    ingredients: [
-      ["Pasta", "12 oz"],
-      ["Zucchini", "1 medium"],
-      ["Carrot", "1 large"],
-      ["Bell pepper", "1"],
-      ["Marinara sauce", "24 oz"],
-      ["Parmesan", "½ cup"],
-      ["Olive oil", "2 tbsp"]
-    ],
-
-    directions: [
-      ["Roast the vegetables",
-       "Heat the oven to 425°F. Chop the zucchini, carrot, and bell pepper. Toss with olive oil and roast for 20–25 minutes until tender."],
-
-      ["Cook the pasta",
-       "Boil salted water and cook the pasta according to the package directions. Reserve about ½ cup pasta water, then drain."],
-
-      ["Make the sauce",
-       "Blend the roasted vegetables with the marinara until smooth. Add a splash of pasta water if needed."],
-
-      ["Bring it together",
-       "Toss the pasta with the sauce and parmesan. Loosen with reserved pasta water as needed."]
-    ]
-  },
-
-  {
-    id: "black-bean-bowls",
-    name: "Black Bean + Sweet Potato Bowls",
-    description: "roasted sweet potatoes · black beans · avocado",
-    time: "40 min",
-    servings: "4",
-
-    ingredients: [
-      ["Sweet potatoes", "3"],
-      ["Black beans", "2 cans"],
-      ["Quinoa", "1 cup"],
-      ["Avocados", "2"],
-      ["Lime", "2"],
-      ["Olive oil", "2 tbsp"],
-      ["Cumin", "1 tsp"]
-    ],
-
-    directions: [
-      ["Roast the sweet potatoes",
-       "Heat oven to 425°F. Cube sweet potatoes, toss with olive oil and cumin, and roast 25–30 minutes."],
-
-      ["Cook the quinoa",
-       "Combine quinoa with 2 cups water. Simmer covered about 15 minutes, then fluff."],
-
-      ["Warm the beans",
-       "Drain and rinse the beans. Warm gently with cumin, salt, pepper, and lime."],
-
-      ["Assemble",
-       "Divide quinoa between bowls and top with sweet potatoes, beans, avocado, and lime."]
-    ]
-  },
-
-  {
-    id: "leftovers",
-    name: "Leftovers + Sandwiches",
-    description: "use what is already in the fridge",
-    time: "—",
-    servings: "as needed",
-
-    ingredients: [
-      ["Leftovers", "as needed"],
-      ["Bread or wraps", "as needed"],
-      ["Fresh fruit", "as needed"]
-    ],
-
-    directions: [
-      ["Check the fridge",
-       "Start with anything that needs to be used first."],
-
-      ["Build dinner",
-       "Make sandwiches, wraps, or simple plates around what you already have."],
-
-      ["Add something fresh",
-       "Serve with fruit or vegetables."]
-    ]
-  },
-
-  {
-    id: "mediterranean-chickpea-pitas",
-    name: "Mediterranean Chickpea Pitas",
-    description: "crispy chickpeas · cucumber · feta · lemon",
-    time: "25 min",
-    servings: "4",
-
-    ingredients: [
-      ["Chickpeas", "2 cans"],
-      ["Pitas", "4"],
-      ["Cucumber", "1"],
-      ["Tomatoes", "2"],
-      ["Feta", "4 oz"],
-      ["Lemon", "1"],
-      ["Greek yogurt", "½ cup"],
-      ["Olive oil", "2 tbsp"]
-    ],
-
-    directions: [
-      ["Crisp the chickpeas",
-       "Drain and dry chickpeas. Season and air fry at 400°F for 12–15 minutes, shaking halfway."],
-
-      ["Make the salad",
-       "Dice cucumber and tomatoes. Toss with lemon, olive oil, salt, and pepper. Add feta."],
-
-      ["Make the sauce",
-       "Stir Greek yogurt with lemon juice and a splash of water."],
-
-      ["Fill the pitas",
-       "Warm pitas and fill with salad and crispy chickpeas. Drizzle with yogurt sauce."]
-    ]
-  },
-
-  {
-    id: "pizza-night",
-    name: "Pizza Night",
-    description: "everyone gets to choose their toppings",
-    time: "20 min",
-    servings: "4",
-
-    ingredients: [
-      ["Pizza dough or crusts", "2"],
-      ["Pizza sauce", "1 cup"],
-      ["Mozzarella", "8 oz"],
-      ["Favorite toppings", "as needed"]
-    ],
-
-    directions: [
-      ["Heat the oven",
-       "Follow the dough or crust package temperature, usually around 450–500°F."],
-
-      ["Build the pizzas",
-       "Spread sauce over the crusts and add mozzarella and toppings."],
-
-      ["Bake",
-       "Bake until the crust is crisp and the cheese is bubbling."]
-    ]
-  },
-
-  {
-    id: "coconut-shrimp",
-    name: "Coconut Shrimp",
-    description: "crispy coconut coating · lime · rice",
-    time: "30 min",
-    servings: "4",
-
-    ingredients: [
-      ["Shrimp", "1 lb"],
-      ["Shredded coconut", "1 cup"],
-      ["Panko", "1 cup"],
-      ["Eggs", "2"],
-      ["Flour", "½ cup"],
-      ["Lime", "1"],
-      ["Rice", "1½ cups"]
-    ],
-
-    directions: [
-      ["Set up the coating",
-       "Place flour, beaten eggs, and coconut mixed with panko in three separate bowls."],
-
-      ["Coat the shrimp",
-       "Dip shrimp in flour, then egg, then coconut-panko mixture."],
-
-      ["Cook",
-       "Air fry at 400°F for 8-10 minutes, turning halfway."],
-
-      ["Serve",
-       "Serve with rice and lime wedges."]
-    ]
-  },
-
-  {
-    id: "chicken-white-bean-soup",
-    name: "Chicken + White Bean Soup",
-    description: "cozy, brothy, and made for leftovers",
-    time: "50 min",
-    servings: "6",
-
-    ingredients: [
-      ["Chicken breast", "1 lb"],
-      ["Cannellini beans", "2 cans"],
-      ["Carrots", "2"],
-      ["Celery", "2 stalks"],
-      ["Onion", "1"],
-      ["Chicken broth", "6 cups"],
-      ["Spinach", "3 cups"],
-      ["Italian seasoning", "1 tbsp"]
-    ],
-
-    directions: [
-      ["Sauté the vegetables",
-       "Cook diced onion, carrots, and celery in olive oil until softened."],
-
-      ["Simmer",
-       "Add broth, beans, seasoning, and chicken. Simmer until chicken is cooked through."],
-
-      ["Shred the chicken",
-       "Remove chicken, shred with two forks, and return it to the pot."],
-
-      ["Finish",
-       "Stir in spinach and simmer until wilted."]
-    ]
-  }
-
+  { id: "hidden-veggie-pasta", name: "Hidden Veggie Pasta", description: "creamy marinara · roasted vegetables · parmesan", time: "35 min", servings: "4", ingredients: [["Pasta","12 oz"],["Zucchini","1 medium"],["Carrot","1 large"],["Bell pepper","1"],["Marinara sauce","24 oz"],["Parmesan","½ cup"],["Olive oil","2 tbsp"]], directions: [["Roast the vegetables","Heat the oven to 425°F. Chop the zucchini, carrot, and bell pepper. Toss with olive oil and roast for 20–25 minutes until tender."],["Cook the pasta","Boil salted water and cook the pasta according to the package directions. Reserve about ½ cup pasta water, then drain."],["Make the sauce","Blend the roasted vegetables with the marinara until smooth. Add a splash of pasta water if needed."],["Bring it together","Toss the pasta with the sauce and parmesan. Loosen with reserved pasta water as needed."]] },
+  { id: "black-bean-bowls", name: "Black Bean + Sweet Potato Bowls", description: "roasted sweet potatoes · black beans · avocado", time: "40 min", servings: "4", ingredients: [["Sweet potatoes","3"],["Black beans","2 cans"],["Quinoa","1 cup"],["Avocados","2"],["Lime","2"],["Olive oil","2 tbsp"],["Cumin","1 tsp"]], directions: [["Roast the sweet potatoes","Heat oven to 425°F. Cube sweet potatoes, toss with olive oil and cumin, and roast 25–30 minutes."],["Cook the quinoa","Combine quinoa with 2 cups water. Simmer covered about 15 minutes, then fluff."],["Warm the beans","Drain and rinse the beans. Warm gently with cumin, salt, pepper, and lime."],["Assemble","Divide quinoa between bowls and top with sweet potatoes, beans, avocado, and lime."]] },
+  { id: "leftovers", name: "Leftovers + Sandwiches", description: "use what is already in the fridge", time: "—", servings: "as needed", ingredients: [["Leftovers","as needed"],["Bread or wraps","as needed"],["Fresh fruit","as needed"]], directions: [["Check the fridge","Start with anything that needs to be used first."],["Build dinner","Make sandwiches, wraps, or simple plates around what you already have."],["Add something fresh","Serve with fruit or vegetables."]] },
+  { id: "mediterranean-chickpea-pitas", name: "Mediterranean Chickpea Pitas", description: "crispy chickpeas · cucumber · feta · lemon", time: "25 min", servings: "4", ingredients: [["Chickpeas","2 cans"],["Pitas","4"],["Cucumber","1"],["Tomatoes","2"],["Feta","4 oz"],["Lemon","1"],["Greek yogurt","½ cup"],["Olive oil","2 tbsp"]], directions: [["Crisp the chickpeas","Drain and dry chickpeas. Season and air fry at 400°F for 12–15 minutes, shaking halfway."],["Make the salad","Dice cucumber and tomatoes. Toss with lemon, olive oil, salt, and pepper. Add feta."],["Make the sauce","Stir Greek yogurt with lemon juice and a splash of water."],["Fill the pitas","Warm pitas and fill with salad and crispy chickpeas. Drizzle with yogurt sauce."]] },
+  { id: "pizza-night", name: "Pizza Night", description: "everyone gets to choose their toppings", time: "20 min", servings: "4", ingredients: [["Pizza dough or crusts","2"],["Pizza sauce","1 cup"],["Mozzarella","8 oz"],["Favorite toppings","as needed"]], directions: [["Heat the oven","Follow the dough or crust package temperature, usually around 450–500°F."],["Build the pizzas","Spread sauce over the crusts and add mozzarella and toppings."],["Bake","Bake until the crust is crisp and the cheese is bubbling."]] },
+  { id: "coconut-shrimp", name: "Coconut Shrimp", description: "crispy coconut coating · lime · rice", time: "30 min", servings: "4", ingredients: [["Shrimp","1 lb"],["Shredded coconut","1 cup"],["Panko","1 cup"],["Eggs","2"],["Flour","½ cup"],["Lime","1"],["Rice","1½ cups"]], directions: [["Set up the coating","Place flour, beaten eggs, and coconut mixed with panko in three separate bowls."],["Coat the shrimp","Dip shrimp in flour, then egg, then coconut-panko mixture."],["Cook","Air fry at 400°F for 8-10 minutes, turning halfway."],["Serve","Serve with rice and lime wedges."]] },
+  { id: "chicken-white-bean-soup", name: "Chicken + White Bean Soup", description: "cozy, brothy, and made for leftovers", time: "50 min", servings: "6", ingredients: [["Chicken breast","1 lb"],["Cannellini beans","2 cans"],["Carrots","2"],["Celery","2 stalks"],["Onion","1"],["Chicken broth","6 cups"],["Spinach","3 cups"],["Italian seasoning","1 tbsp"]], directions: [["Sauté the vegetables","Cook diced onion, carrots, and celery in olive oil until softened."],["Simmer","Add broth, beans, seasoning, and chicken. Simmer until chicken is cooked through."],["Shred the chicken","Remove chicken, shred with two forks, and return it to the pot."],["Finish","Stir in spinach and simmer until wilted."]] }
 ];
 
+const defaultWeek = { Monday: "hidden-veggie-pasta", Tuesday: "black-bean-bowls", Wednesday: "leftovers", Thursday: "mediterranean-chickpea-pitas", Friday: "pizza-night", Saturday: "coconut-shrimp", Sunday: "chicken-white-bean-soup" };
 
 /*
-==================================================
-WEEKLY PLAN
-==================================================
+LOCAL STORAGE + (optional) Supabase sync
 */
 
-const defaultWeek = {
-
-  Monday: "hidden-veggie-pasta",
-  Tuesday: "black-bean-bowls",
-  Wednesday: "leftovers",
-  Thursday: "mediterranean-chickpea-pitas",
-  Friday: "pizza-night",
-  Saturday: "coconut-shrimp",
-  Sunday: "chicken-white-bean-soup"
-
-};
-
-
-/*
-==================================================
-LOCAL STORAGE
-==================================================
-*/
+let recipes = [];
+let week = {};
 
 function loadRecipes() {
-
-  const saved =
-    localStorage.getItem("ourTableRecipes");
-
-  if (saved) {
-    return JSON.parse(saved);
-  }
-
-  localStorage.setItem(
-    "ourTableRecipes",
-    JSON.stringify(defaultRecipes)
-  );
-
+  const saved = localStorage.getItem("ourTableRecipes");
+  if (saved) return JSON.parse(saved);
+  localStorage.setItem("ourTableRecipes", JSON.stringify(defaultRecipes));
   return [...defaultRecipes];
 }
 
-
 function loadWeek() {
-
-  const saved =
-    localStorage.getItem("ourTableWeek");
-
-  if (saved) {
-    return JSON.parse(saved);
-  }
-
-  localStorage.setItem(
-    "ourTableWeek",
-    JSON.stringify(defaultWeek)
-  );
-
+  const saved = localStorage.getItem("ourTableWeek");
+  if (saved) return JSON.parse(saved);
+  localStorage.setItem("ourTableWeek", JSON.stringify(defaultWeek));
   return {...defaultWeek};
 }
 
+recipes = loadRecipes();
+week = loadWeek();
 
-let recipes = loadRecipes();
-let week = loadWeek();
+async function saveAll() {
+  localStorage.setItem("ourTableRecipes", JSON.stringify(recipes));
+  localStorage.setItem("ourTableWeek", JSON.stringify(week));
+  // also attempt to save to Supabase if configured
+  if (typeof initSupabase === 'function' && window._supabaseClient) {
+    try {
+      // upsert recipes (assumes table 'recipes' with primary key 'id')
+      await window._supabaseClient.from('recipes').upsert(recipes, { onConflict: 'id' });
+    } catch (e) {
+      console.warn('Failed to save recipes to Supabase', e);
+    }
 
-
-function saveAll() {
-
-  localStorage.setItem(
-    "ourTableRecipes",
-    JSON.stringify(recipes)
-  );
-
-  localStorage.setItem(
-    "ourTableWeek",
-    JSON.stringify(week)
-  );
+    try {
+      // upsert week into a simple 'weeks' table; adjust schema as needed
+      await window._supabaseClient.from('weeks').upsert([{ id: 'default', plan: week }], { onConflict: 'id' });
+    } catch (e) {
+      console.warn('Failed to save week to Supabase', e);
+    }
+  }
 }
 
 /*
-... (rest of the original app code remains unchanged) ...
+WEEK VIEW
 */
 
-// The original app code continues; we will keep it intact until the end where we replace the final render calls and add the Supabase integration.
-
-// --- (CUT - rest of the app code preserved) ---
-
-</script>
-
-<!-- Supabase client -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-/* Supabase integration added per request (keys provided by repository owner) */
-const SUPABASE_URL = 'https://agqpwjhtbxytllbnpgbo.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFncXB3amh0Ynh5dGxsYm5wZ2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MzkyNjEsImV4cCI6MjEwNzQxNTI2MX0.365rGPl6wFsh-e3zUUHU7GCsOU1FISsFMQAIm09lJpY';
-const HOUSEHOLD_ID = 'shared';
-
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-function saveAllLocal() {
-  localStorage.setItem("ourTableRecipes", JSON.stringify(recipes));
-  localStorage.setItem("ourTableWeek", JSON.stringify(week));
+function renderWeek() {
+  const days = [ ["Monday","Oct 5"],["Tuesday","Oct 6"],["Wednesday","Oct 7"],["Thursday","Oct 8"],["Friday","Oct 9"],["Saturday","Oct 10"],["Sunday","Oct 11"] ];
+  const list = document.getElementById("mealList");
+  list.innerHTML = days.map(day => {
+    const recipe = recipes.find(r => r.id === week[day[0]]);
+    if (!recipe) {
+      return `\n        <button class="meal-card" onclick="showRecipesForDay('${day[0]}')">\n          <div class="day">${day[0].slice(0,3)}<span class="day-number">${day[1].slice(4)}</span></div>\n          <div><div class="meal-name">Choose a recipe</div><div class="meal-description">Tap to select from your recipe box</div></div>\n          <div class="arrow">›</div>\n        </button>`;
+    }
+    return `\n      <button class="meal-card" onclick="openRecipe('${recipe.id}')">\n        <div class="day">${day[0].slice(0,3)}<span class="day-number">${day[1].slice(4)}</span></div>\n        <div><div class="meal-name">${recipe.name}</div><div class="meal-description">${recipe.description || ""}</div></div>\n        <div class="arrow">›</div>\n      </button>`;
+  }).join("");
 }
 
-async function fetchRecipesFromSupabase() {
-  try {
-    const { data, error } = await supabaseClient.from('recipes').select('*');
-    if (error) throw error;
-    if (Array.isArray(data) && data.length) {
-      recipes = data.map(r => ({
-        id: r.id,
-        name: r.name,
-        description: r.description,
-        time: r.time,
-        servings: r.servings,
-        ingredients: r.ingredients || [],
-        directions: r.directions || [],
-        sourceUrl: r.source_url || ""
-      }));
-      saveAllLocal();
-    }
-  } catch (err) {
-    console.warn('Could not fetch recipes from Supabase; using local data.', err);
+/*
+RECIPE BOX
+*/
+
+function renderRecipeBox() {
+  const list = document.getElementById("recipeBoxList");
+  if (!recipes.length) { list.innerHTML = `<div class="empty">Your recipe box is empty.</div>`; return; }
+  list.innerHTML = recipes.map(recipe => `\n    <button class="recipe-box-card" onclick="openRecipe('${recipe.id}')">\n      <div class="recipe-box-name">${recipe.name}</div>\n      <div class="recipe-box-meta">${recipe.time || 'Recipe'} · ${recipe.servings ? `serves ${recipe.servings}` : 'saved recipe'}</div>\n    </button>`).join("");
+}
+
+/*
+RECIPE DETAIL
+*/
+
+function openRecipe(id) {
+  const recipe = recipes.find(r => r.id === id);
+  if (!recipe) return;
+  document.getElementById("recipeContent").innerHTML = `\n    <div class="detail-kicker">Recipe</div>\n    <h2 class="detail-title">${recipe.name}</h2>\n    ${recipe.description ? `<div class="detail-description">${recipe.description}</div>` : ''}\n    <div class="recipe-meta">${recipe.time ? `<span>${recipe.time}</span>` : ''}${recipe.servings ? `<span>Serves ${recipe.servings}</span>` : ''}</div>\n    <div class="recipe-section"><h2>Ingredients</h2><ul class="ingredients">${(recipe.ingredients||[]).map(item => `<li><span>${item[0]}</span><span>${item[1]}</span></li>`).join('')}</ul></div>\n    <div class="recipe-section"><h2>Directions</h2><ol class="directions">${(recipe.directions||[]).map(step => `<li><strong>${step[0]}</strong>${step[1]}</li>`).join('')}</ol></div>\n    <div class="assign-box"><label>Add this recipe to your week</label><div class="assign-row"><select id="assignDay" class="day-select"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select><button class="primary-button" onclick="assignRecipe('${recipe.id}')">Add</button></div></div>`;
+  showView('recipe');
+}
+
+/*
+ASSIGN RECIPE
+*/
+
+function assignRecipe(id) {
+  const day = document.getElementById('assignDay').value;
+  week[day] = id;
+  saveAll();
+  renderWeek(); renderGrocery(); showView('week');
+}
+
+/*
+GROCERY
+*/
+
+function renderGrocery() {
+  const container = document.getElementById('groceryList');
+  const ingredients = {};
+  Object.values(week).forEach(recipeId => {
+    const recipe = recipes.find(r => r.id === recipeId);
+    if (!recipe) return;
+    (recipe.ingredients||[]).forEach(item => {
+      const name = item[0]; const quantity = item[1]; if (!ingredients[name]) ingredients[name]=[]; ingredients[name].push(quantity);
+    });
+  });
+  if (!Object.keys(ingredients).length) { container.innerHTML = `<div class="empty">Add some recipes to your week and your grocery list will appear here.</div>`; return; }
+  container.innerHTML = `<div class="grocery-group"><h2>Everything we need</h2>${Object.entries(ingredients).map(([name, quantities], index)=>`<label class="grocery-item"><input type="checkbox" data-grocery="${index}"><span>${quantities.join(' + ')} ${name}</span></label>`).join('')}</div>`;
+}
+
+/*
+RECIPE IMPORT (placeholder)
+*/
+
+function importRecipe(){
+  const input = document.getElementById('recipeUrl');
+  const url = (input && input.value || '').trim();
+  if (!url) { alert('Paste a recipe URL first.'); return; }
+  alert('The recipe importer is the next piece we\'ll connect. Your Recipe Box is already set up to save imported recipes.');
+}
+
+function saveImportedRecipe(importedRecipe){
+  const id = 'recipe-' + Date.now();
+  const recipe = { id, name: importedRecipe.name, description: importedRecipe.description||'', time: importedRecipe.time||'', servings: importedRecipe.servings||'', ingredients: importedRecipe.ingredients||[], directions: importedRecipe.directions||[], sourceUrl: importedRecipe.sourceUrl||'' };
+  recipes.push(recipe); saveAll(); renderRecipeBox(); openRecipe(id);
+}
+
+/*
+VIEW NAV
+*/
+
+function showView(view){
+  document.querySelectorAll('.view').forEach(s=>s.classList.remove('active'));
+  if (view==='week') document.getElementById('weekView').classList.add('active');
+  if (view==='recipes') document.getElementById('recipesView').classList.add('active');
+  if (view==='grocery') document.getElementById('groceryView').classList.add('active');
+  if (view==='recipe') document.getElementById('recipeView').classList.add('active');
+  document.querySelectorAll('.nav-button').forEach(b=>b.classList.remove('active'));
+  if (view==='week') document.getElementById('weekNav').classList.add('active');
+  if (view==='recipes') document.getElementById('recipesNav').classList.add('active');
+  if (view==='grocery') document.getElementById('groceryNav').classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/*
+INITIALIZE UI
+*/
+
+renderWeek(); renderRecipeBox(); renderGrocery();
+
+/*
+Small fixes: dynamic week subtitle and nav click handlers
+*/
+(function fixWeekSubtitle(){
+  const subtitle = document.querySelector('#weekView .page-subtitle'); if(!subtitle) return; const now=new Date(); const day=now.getDay(); const mondayOffset=(day===0)?-6:(1-day); const monday=new Date(now); monday.setDate(now.getDate()+mondayOffset); const sunday=new Date(monday); sunday.setDate(monday.getDate()+6); const fmt=(d)=>d.toLocaleString('en-US',{month:'short'}); subtitle.textContent = `${fmt(monday)} ${monday.getDate()} — ${fmt(sunday)} ${sunday.getDate()}`;
+})();
+
+(function ensureNavHandler(){ const navMap={'weekNav':'week','recipesNav':'recipes','groceryNav':'grocery'}; Object.entries(navMap).forEach(([id,view])=>{const el=document.getElementById(id); if(!el||el.dataset.navBound==='true')return; el.addEventListener('click',()=>showView(view)); el.dataset.navBound='true';}); })();
+
+/*
+=================================================
+SUPABASE INTEGRATION (optional)
+=================================================
+
+How this works:
+- Create a local file `supabase-config.js` (NOT committed) that defines SUPABASE_URL and SUPABASE_ANON_KEY constants.
+  Example in supabase-config.example.js in the repo.
+- When those constants exist, the app will try to initialize a Supabase client, fetch `recipes` and `weeks` (simple schema explained below), and keep localStorage in sync.
+
+Recommended minimal Supabase schema:
+- Table: recipes
+  - id (text, primary key)
+  - name (text)
+  - description (text)
+  - time (text)
+  - servings (text)
+  - ingredients (json)
+  - directions (json)
+  - source_url (text)
+
+- Table: weeks
+  - id (text, primary key)  -- use 'default'
+  - plan (json)            -- object with Monday..Sunday mapping to recipe ids
+
+This integration is intentionally forgiving: it will fall back to localStorage when Supabase isn't configured or errors occur.
+*/
+
+async function initSupabase(){
+  if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
+    console.log('Supabase not configured — running in local-only mode.');
+    return;
   }
-  renderRecipeBox();
-}
-
-async function fetchMealPlanFromSupabase() {
-  try {
-    const { data, error } = await supabaseClient
-      .from('meal_plan_entries')
-      .select('day,recipe_id')
-      .eq('household_id', HOUSEHOLD_ID);
-
-    if (error) throw error;
-    if (Array.isArray(data)) {
-      const serverWeek = { ...defaultWeek };
-      data.forEach(row => {
-        if (row.day && row.recipe_id) serverWeek[row.day] = row.recipe_id;
-      });
-      week = serverWeek;
-      saveAllLocal();
-    }
-  } catch (err) {
-    console.warn('Could not fetch meal plan from Supabase; using local week.', err);
-  }
-  renderWeek();
-  renderGrocery();
-}
-
-function subscribeRealtime() {
-  const channel = supabaseClient.channel('public:meal_plan_entries');
-  channel.on(
-    'postgres_changes',
-    { event: '*', schema: 'public', table: 'meal_plan_entries', filter: `household_id=eq.${HOUSEHOLD_ID}` },
-    payload => {
-      console.log('Realtime payload', payload);
-      fetchMealPlanFromSupabase();
-    }
-  );
-  channel.subscribe().catch(err => console.warn('realtime subscribe failed', err));
-}
-
-async function saveAll() {
-  // persist locally first
-  saveAllLocal();
 
   try {
-    const days = Object.keys(week);
-    for (const day of days) {
-      const recipeId = week[day] || null;
-      const row = {
-        household_id: HOUSEHOLD_ID,
-        day,
-        recipe_id: recipeId
-      };
-      const { error } = await supabaseClient
-        .from('meal_plan_entries')
-        .upsert(row, { onConflict: ['household_id', 'day'] });
-      if (error) console.warn('meal_plan_entries upsert error', error);
+    window._supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const client = window._supabaseClient;
+
+    // fetch recipes
+    const { data: recipesData, error: rErr } = await client.from('recipes').select('*');
+    if (!rErr && Array.isArray(recipesData)) {
+      // map rows to app schema; assumes ingredients/directions stored as JSON arrays
+      recipes = recipesData.map(r => ({ id: r.id, name: r.name, description: r.description, time: r.time, servings: r.servings, ingredients: r.ingredients || [], directions: r.directions || [], sourceUrl: r.source_url || '' }));
     }
 
-    for (const r of recipes) {
-      const row = {
-        id: r.id,
-        name: r.name,
-        description: r.description || null,
-        time: r.time || null,
-        servings: r.servings || null,
-        ingredients: r.ingredients || [],
-        directions: r.directions || [],
-        source_url: r.sourceUrl || null
-      };
-      const { error } = await supabaseClient.from('recipes').upsert(row, { onConflict: 'id' });
-      if (error) console.warn('recipes upsert error', error);
+    // fetch week plan (row id 'default')
+    const { data: weekData, error: wErr } = await client.from('weeks').select('*').eq('id','default').limit(1).maybeSingle();
+    if (!wErr && weekData && weekData.plan) {
+      week = weekData.plan;
     }
-  } catch (err) {
-    console.warn('Supabase save failed — keeping changes locally.', err);
+
+    // persist locally and re-render
+    localStorage.setItem('ourTableRecipes', JSON.stringify(recipes));
+    localStorage.setItem('ourTableWeek', JSON.stringify(week));
+
+    renderWeek(); renderRecipeBox(); renderGrocery();
+
+    // listen for local changes and push to Supabase via saveAll (already calls upsert)
+
+    console.log('Supabase initialized — syncing with cloud.');
+  } catch (e) {
+    console.error('Supabase initialization failed', e);
   }
 }
 
-async function initSync() {
-  recipes = loadRecipes();
-  week = loadWeek();
-  renderWeek();
-  renderRecipeBox();
-  renderGrocery();
+// initialize if config is present
+initSupabase();
 
-  await Promise.all([fetchRecipesFromSupabase(), fetchMealPlanFromSupabase()]);
-
-  subscribeRealtime();
-}
-
-initSync();
 </script>
 
 </body>
