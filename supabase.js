@@ -1,3 +1,4 @@
+// Supabase browser layer with simple auth (magic-link) and owner handling
 window.OurTableSupabase = (() => {
   const SUPABASE_URL = 'https://agqpwjhtbxytllbnpgbo.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_xjnPDwRl5MX7NT2IqvhvJw_juF6zzEo';
@@ -7,12 +8,19 @@ window.OurTableSupabase = (() => {
 
   async function ensureClient() {
     if (client) return client;
-
     const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
     client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Listen for auth changes to keep UI in sync
+    client.auth.onAuthStateChange(() => {
+      // Trigger a UI refresh if the app exposes updateAuthUI
+      if (typeof window.updateAuthUI === 'function') window.updateAuthUI();
+    });
+
     return client;
   }
 
+  // local fallback functions
   function fallbackLoadRecipesLocal() {
     const saved = localStorage.getItem('ourTableRecipes');
     if (saved) return JSON.parse(saved);
@@ -37,7 +45,7 @@ window.OurTableSupabase = (() => {
     localStorage.setItem('ourTableWeek', JSON.stringify(week));
   }
 
-  function normalizeRecipeRecipe(row) {
+  function normalizeRecipeRow(row) {
     return {
       id: row.id,
       name: row.name,
@@ -45,7 +53,9 @@ window.OurTableSupabase = (() => {
       time: row.time || '',
       servings: row.servings || '',
       ingredients: row.ingredients || [],
-      directions: row.directions || []
+      directions: row.directions || [],
+      owner: row.owner || null,
+      sourceUrl: row.sourceUrl || ''
     };
   }
 
@@ -62,12 +72,15 @@ window.OurTableSupabase = (() => {
       }
       return [];
     }
-    return data.map(normalizeRecipeRecipe);
+    return data.map(normalizeRecipeRow);
   }
 
   async function saveRecipesToSupabase(recipes) {
     const supabase = await ensureClient();
-    const rows = recipes.map((recipe) => ({ ...recipe }));
+    // attach owner when authenticated
+    const { data: userData } = await supabase.auth.getUser();
+    const ownerId = userData?.user?.id || null;
+    const rows = recipes.map((recipe) => ({ ...recipe, owner: recipe.owner || ownerId }));
     const { data, error } = await supabase.from('recipes').upsert(rows);
     if (error) throw error;
     return data || rows;
@@ -96,9 +109,13 @@ window.OurTableSupabase = (() => {
 
   async function saveWeekToSupabase(week) {
     const supabase = await ensureClient();
+    const { data: userData } = await supabase.auth.getUser();
+    const ownerId = userData?.user?.id || null;
+
+    // store owner in plans table as well for potential future policies
     const { data, error } = await supabase
       .from('plans')
-      .upsert([{ id: DEFAULT_PLAN_ID, name: 'Default plan', assignments: week }]);
+      .upsert([{ id: DEFAULT_PLAN_ID, name: 'Default plan', assignments: week, owner: ownerId }]);
 
     if (error) throw error;
     return data || week;
@@ -109,19 +126,6 @@ window.OurTableSupabase = (() => {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '') || 'recipe';
-  }
-
-  function buildManualRecipe(url, name) {
-    return {
-      id: `${slugify(name)}-${Date.now()}`,
-      name,
-      description: '',
-      time: '',
-      servings: '',
-      ingredients: [],
-      directions: [],
-      sourceUrl: url
-    };
   }
 
   function buildPromptRecipe(url) {
@@ -195,6 +199,26 @@ window.OurTableSupabase = (() => {
     }
   }
 
+  async function signInWithEmail(email) {
+    const supabase = await ensureClient();
+    const { error } = await supabase.auth.signInWithOtp({ email });
+    if (error) throw error;
+    return true;
+  }
+
+  async function signOut() {
+    const supabase = await ensureClient();
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+    return true;
+  }
+
+  async function getCurrentUser() {
+    const supabase = await ensureClient();
+    const { data } = await supabase.auth.getUser();
+    return data?.user || null;
+  }
+
   async function importRecipe() {
     const input = document.getElementById('recipeUrl');
     const url = (input && input.value ? input.value.trim() : '');
@@ -205,18 +229,13 @@ window.OurTableSupabase = (() => {
     }
 
     try {
-      // No extractor is configured yet, so this falls back to a manual recipe record.
+      // Manual entry flow
       const recipe = buildPromptRecipe(url);
       if (!recipe) return;
 
       const currentRecipes = (await loadRecipes()) || [];
       const updatedRecipes = [...currentRecipes, recipe];
       await saveRecipes(updatedRecipes);
-
-      const currentWeek = await loadWeek();
-      if (!currentWeek || typeof currentWeek !== 'object') {
-        await saveWeek({});
-      }
 
       if (input) input.value = '';
       if (typeof renderAll === 'function') renderAll();
@@ -240,6 +259,9 @@ window.OurTableSupabase = (() => {
       if (typeof renderAll === 'function') {
         renderAll();
       }
+
+      // trigger an auth UI update if defined
+      if (typeof window.updateAuthUI === 'function') window.updateAuthUI();
     } catch (err) {
       console.error('Supabase initData failed:', err);
     }
@@ -259,7 +281,10 @@ window.OurTableSupabase = (() => {
     loadWeek,
     saveWeek,
     importRecipe,
-    initData
+    initData,
+    signInWithEmail,
+    signOut,
+    getCurrentUser
   };
 })();
 
