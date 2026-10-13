@@ -590,148 +590,76 @@ h2 {
   <div class="header-mark">⌂</div>
 </header>
 
-
 <!-- WEEK -->
-
 <section id="weekView" class="view active">
 
   <div class="page-header">
     <div class="eyebrow">This week</div>
     <h1>What we're eating</h1>
-    <div class="page-subtitle">
-      October 5 — October 11
-    </div>
+    <div class="page-subtitle">October 5 — October 11</div>
   </div>
 
   <div id="mealList" class="meal-list"></div>
 
 </section>
 
-
 <!-- RECIPE BOX -->
-
 <section id="recipesView" class="view">
 
   <div class="page-header">
     <div class="eyebrow">Your collection</div>
     <h1>Recipe box</h1>
-    <div class="page-subtitle">
-      Recipes you've saved to Our Table
-    </div>
+    <div class="page-subtitle">Recipes you've saved to Our Table</div>
   </div>
 
   <div class="add-recipe-card">
-
     <h2>Add a recipe</h2>
-
-    <p>
-      Paste a recipe URL and Our Table will import the recipe
-      into your collection.
-    </p>
-
+    <p>Paste a URL or add one manually to your collection.</p>
     <div class="url-row">
-
-      <input
-        id="recipeUrl"
-        class="url-input"
-        type="url"
-        placeholder="Paste recipe URL"
-      >
-
-      <button
-        class="import-button"
-        onclick="importRecipe()"
-      >
-        Import
-      </button>
-
+      <input id="recipeUrl" class="url-input" type="url" placeholder="Paste recipe URL">
+      <button class="import-button" onclick="importRecipe()">Add</button>
     </div>
-
   </div>
 
   <div id="recipeBoxList" class="recipe-box-list"></div>
 
 </section>
 
-
 <!-- GROCERY -->
-
 <section id="groceryView" class="view">
 
   <div class="page-header">
     <div class="eyebrow">From this week's meals</div>
     <h1>Grocery list</h1>
-    <div class="page-subtitle">
-      Generated from the recipes on your week
-    </div>
+    <div class="page-subtitle">Generated from the recipes on your week</div>
   </div>
 
   <div id="groceryList"></div>
 
 </section>
 
-
 <!-- RECIPE -->
-
 <section id="recipeView" class="view">
-
-  <button
-    class="back-button"
-    onclick="showView('week')"
-  >
-    ← Back
-  </button>
-
+  <button class="back-button" onclick="showView('week')">← Back</button>
   <div id="recipeContent"></div>
-
 </section>
 
 </div>
 
-
 <nav class="bottom-nav">
-
-  <button
-    id="weekNav"
-    class="nav-button active"
-    onclick="showView('week')"
-  >
-    <span class="nav-icon">⌂</span>
-    Week
-  </button>
-
-  <button
-    id="recipesNav"
-    class="nav-button"
-    onclick="showView('recipes')"
-  >
-    <span class="nav-icon">▢</span>
-    Recipes
-  </button>
-
-  <button
-    id="groceryNav"
-    class="nav-button"
-    onclick="showView('grocery')"
-  >
-    <span class="nav-icon">□</span>
-    Grocery
-  </button>
-
+  <button id="weekNav" class="nav-button active" onclick="showView('week')"><span class="nav-icon">⌂</span>Week</button>
+  <button id="recipesNav" class="nav-button" onclick="showView('recipes')"><span class="nav-icon">▢</span>Recipes</button>
+  <button id="groceryNav" class="nav-button" onclick="showView('grocery')"><span class="nav-icon">□</span>Grocery</button>
 </nav>
 
 <!-- Supabase client (optional) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- Create a local file named `supabase-config.js` with your SUPABASE_URL and SUPABASE_ANON_KEY constants to enable cloud sync. See supabase-config.example.js -->
 <script src="supabase-config.js"></script>
 
 <script>
 
-/*
-=================================================
-OUR TABLE DATA
-=================================================
-*/
+const dayNames = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+let selectedDay = null;
 
 const defaultRecipes = [
   { id: "hidden-veggie-pasta", name: "Hidden Veggie Pasta", description: "creamy marinara · roasted vegetables · parmesan", time: "35 min", servings: "4", ingredients: [["Pasta","12 oz"],["Zucchini","1 medium"],["Carrot","1 large"],["Bell pepper","1"],["Marinara sauce","24 oz"],["Parmesan","½ cup"],["Olive oil","2 tbsp"]], directions: [["Roast the vegetables","Heat the oven to 425°F. Chop the zucchini, carrot, and bell pepper. Toss with olive oil and roast for 20–25 minutes until tender."],["Cook the pasta","Boil salted water and cook the pasta according to the package directions. Reserve about ½ cup pasta water, then drain."],["Make the sauce","Blend the roasted vegetables with the marinara until smooth. Add a splash of pasta water if needed."],["Bring it together","Toss the pasta with the sauce and parmesan. Loosen with reserved pasta water as needed."]] },
@@ -745,44 +673,62 @@ const defaultRecipes = [
 
 const defaultWeek = { Monday: "hidden-veggie-pasta", Tuesday: "black-bean-bowls", Wednesday: "leftovers", Thursday: "mediterranean-chickpea-pitas", Friday: "pizza-night", Saturday: "coconut-shrimp", Sunday: "chicken-white-bean-soup" };
 
-/*
-LOCAL STORAGE + (optional) Supabase sync
-*/
+function getCurrentWeekInfo() {
+  const now = new Date();
+  const dayIndex = now.getDay();
+  const mondayOffset = dayIndex === 0 ? -6 : 1 - dayIndex;
+  const monday = new Date(now);
+  monday.setDate(now.getDate() + mondayOffset);
 
-let recipes = [];
-let week = {};
+  const days = dayNames.map((name, idx) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + idx);
+    return { name, dayNumber: d.getDate(), date: d };
+  });
+
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+
+  return { monday, sunday, days };
+}
+
+function updateWeekSubtitle() {
+  const subtitle = document.querySelector('#weekView .page-subtitle');
+  if (!subtitle) return;
+  const { monday, sunday } = getCurrentWeekInfo();
+  const fmt = (d) => d.toLocaleString('en-US', { month: 'short' });
+  subtitle.textContent = `${fmt(monday)} ${monday.getDate()} — ${fmt(sunday)} ${sunday.getDate()}`;
+}
 
 function loadRecipes() {
-  const saved = localStorage.getItem("ourTableRecipes");
+  const saved = localStorage.getItem('ourTableRecipes');
   if (saved) return JSON.parse(saved);
-  localStorage.setItem("ourTableRecipes", JSON.stringify(defaultRecipes));
+  localStorage.setItem('ourTableRecipes', JSON.stringify(defaultRecipes));
   return [...defaultRecipes];
 }
 
 function loadWeek() {
-  const saved = localStorage.getItem("ourTableWeek");
+  const saved = localStorage.getItem('ourTableWeek');
   if (saved) return JSON.parse(saved);
-  localStorage.setItem("ourTableWeek", JSON.stringify(defaultWeek));
-  return {...defaultWeek};
+  localStorage.setItem('ourTableWeek', JSON.stringify(defaultWeek));
+  return { ...defaultWeek };
 }
 
-recipes = loadRecipes();
-week = loadWeek();
+let recipes = loadRecipes();
+let week = loadWeek();
 
 async function saveAll() {
-  localStorage.setItem("ourTableRecipes", JSON.stringify(recipes));
-  localStorage.setItem("ourTableWeek", JSON.stringify(week));
-  // also attempt to save to Supabase if configured
-  if (typeof initSupabase === 'function' && window._supabaseClient) {
+  localStorage.setItem('ourTableRecipes', JSON.stringify(recipes));
+  localStorage.setItem('ourTableWeek', JSON.stringify(week));
+
+  if (typeof window !== 'undefined' && window._supabaseClient) {
     try {
-      // upsert recipes (assumes table 'recipes' with primary key 'id')
       await window._supabaseClient.from('recipes').upsert(recipes, { onConflict: 'id' });
     } catch (e) {
       console.warn('Failed to save recipes to Supabase', e);
     }
 
     try {
-      // upsert week into a simple 'weeks' table; adjust schema as needed
       await window._supabaseClient.from('weeks').upsert([{ id: 'default', plan: week }], { onConflict: 'id' });
     } catch (e) {
       console.warn('Failed to save week to Supabase', e);
@@ -790,150 +736,350 @@ async function saveAll() {
   }
 }
 
-/*
-WEEK VIEW
-*/
-
 function renderWeek() {
-  const days = [ ["Monday","Oct 5"],["Tuesday","Oct 6"],["Wednesday","Oct 7"],["Thursday","Oct 8"],["Friday","Oct 9"],["Saturday","Oct 10"],["Sunday","Oct 11"] ];
-  const list = document.getElementById("mealList");
-  list.innerHTML = days.map(day => {
-    const recipe = recipes.find(r => r.id === week[day[0]]);
-    if (!recipe) {
-      return `\n        <button class="meal-card" onclick="showRecipesForDay('${day[0]}')">\n          <div class="day">${day[0].slice(0,3)}<span class="day-number">${day[1].slice(4)}</span></div>\n          <div><div class="meal-name">Choose a recipe</div><div class="meal-description">Tap to select from your recipe box</div></div>\n          <div class="arrow">›</div>\n        </button>`;
-    }
-    return `\n      <button class="meal-card" onclick="openRecipe('${recipe.id}')">\n        <div class="day">${day[0].slice(0,3)}<span class="day-number">${day[1].slice(4)}</span></div>\n        <div><div class="meal-name">${recipe.name}</div><div class="meal-description">${recipe.description || ""}</div></div>\n        <div class="arrow">›</div>\n      </button>`;
-  }).join("");
-}
+  const { days } = getCurrentWeekInfo();
+  const list = document.getElementById('mealList');
 
-/*
-RECIPE BOX
-*/
+  list.innerHTML = days.map(day => {
+    const recipe = recipes.find(r => r.id === week[day.name]);
+
+    if (!recipe) {
+      return `
+        <button class="meal-card" onclick="showRecipesForDay('${day.name}')">
+          <div class="day">${day.name.slice(0,3)}<span class="day-number">${day.dayNumber}</span></div>
+          <div>
+            <div class="meal-name">Choose a recipe</div>
+            <div class="meal-description">Tap to select from your recipe box</div>
+          </div>
+          <div class="arrow">›</div>
+        </button>
+      `;
+    }
+
+    return `
+      <button class="meal-card" onclick="openRecipe('${recipe.id}')">
+        <div class="day">${day.name.slice(0,3)}<span class="day-number">${day.dayNumber}</span></div>
+        <div>
+          <div class="meal-name">${recipe.name}</div>
+          <div class="meal-description">${recipe.description || ''}</div>
+        </div>
+        <div class="arrow">›</div>
+      </button>
+    `;
+  }).join('');
+}
 
 function renderRecipeBox() {
-  const list = document.getElementById("recipeBoxList");
-  if (!recipes.length) { list.innerHTML = `<div class="empty">Your recipe box is empty.</div>`; return; }
-  list.innerHTML = recipes.map(recipe => `\n    <button class="recipe-box-card" onclick="openRecipe('${recipe.id}')">\n      <div class="recipe-box-name">${recipe.name}</div>\n      <div class="recipe-box-meta">${recipe.time || 'Recipe'} · ${recipe.servings ? `serves ${recipe.servings}` : 'saved recipe'}</div>\n    </button>`).join("");
+  const list = document.getElementById('recipeBoxList');
+  if (!recipes.length) {
+    list.innerHTML = '<div class="empty">Your recipe box is empty.</div>';
+    return;
+  }
+
+  let heading = '';
+  if (selectedDay) {
+    heading = `<div class="empty" style="padding-top:0;padding-bottom:10px;">Assigning a recipe to ${selectedDay}.</div>`;
+  }
+
+  list.innerHTML = heading + recipes.map(recipe => `
+    <button class="recipe-box-card" onclick="${selectedDay ? `assignRecipeToSelectedDay('${recipe.id}')` : `openRecipe('${recipe.id}')`}">
+      <div class="recipe-box-name">${recipe.name}</div>
+      <div class="recipe-box-meta">${recipe.time || 'Recipe'} · ${recipe.servings ? `serves ${recipe.servings}` : 'saved recipe'}</div>
+    </button>
+  `).join('');
 }
 
-/*
-RECIPE DETAIL
-*/
+function showRecipesForDay(day) {
+  selectedDay = day;
+  renderRecipeBox();
+  showView('recipes');
+}
+
+function assignRecipeToSelectedDay(id) {
+  if (!selectedDay) {
+    openRecipe(id);
+    return;
+  }
+
+  week[selectedDay] = id;
+  saveAll();
+  renderWeek();
+  renderGrocery();
+  selectedDay = null;
+  showView('week');
+}
+
+function escapeHtml(str) {
+  return String(str || '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[char]));
+}
 
 function openRecipe(id) {
   const recipe = recipes.find(r => r.id === id);
   if (!recipe) return;
-  document.getElementById("recipeContent").innerHTML = `\n    <div class="detail-kicker">Recipe</div>\n    <h2 class="detail-title">${recipe.name}</h2>\n    ${recipe.description ? `<div class="detail-description">${recipe.description}</div>` : ''}\n    <div class="recipe-meta">${recipe.time ? `<span>${recipe.time}</span>` : ''}${recipe.servings ? `<span>Serves ${recipe.servings}</span>` : ''}</div>\n    <div class="recipe-section"><h2>Ingredients</h2><ul class="ingredients">${(recipe.ingredients||[]).map(item => `<li><span>${item[0]}</span><span>${item[1]}</span></li>`).join('')}</ul></div>\n    <div class="recipe-section"><h2>Directions</h2><ol class="directions">${(recipe.directions||[]).map(step => `<li><strong>${step[0]}</strong>${step[1]}</li>`).join('')}</ol></div>\n    <div class="assign-box"><label>Add this recipe to your week</label><div class="assign-row"><select id="assignDay" class="day-select"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select><button class="primary-button" onclick="assignRecipe('${recipe.id}')">Add</button></div></div>`;
+
+  document.getElementById('recipeContent').innerHTML = `
+    <div class="detail-kicker">Recipe</div>
+    <h2 class="detail-title">${escapeHtml(recipe.name)}</h2>
+    ${recipe.description ? `<div class="detail-description">${escapeHtml(recipe.description)}</div>` : ''}
+    <div class="recipe-meta">
+      ${recipe.time ? `<span>${escapeHtml(recipe.time)}</span>` : ''}
+      ${recipe.servings ? `<span>Serves ${escapeHtml(recipe.servings)}</span>` : ''}
+    </div>
+
+    <div style="display:flex; gap:8px; margin-bottom:8px;">
+      <button class="secondary-button" onclick="showEditRecipeForm('${recipe.id}')">Edit</button>
+      <button class="text-button" onclick="deleteRecipePrompt('${recipe.id}')">Delete</button>
+    </div>
+
+    <div class="recipe-section">
+      <h2>Ingredients</h2>
+      <ul class="ingredients">
+        ${(recipe.ingredients || []).map(item => `
+          <li>
+            <span>${escapeHtml(item[0])}</span>
+            <span>${escapeHtml(item[1])}</span>
+          </li>
+        `).join('')}
+      </ul>
+    </div>
+
+    <div class="recipe-section">
+      <h2>Directions</h2>
+      <ol class="directions">
+        ${(recipe.directions || []).map(step => `
+          <li>
+            <strong>${escapeHtml(step[0])}</strong>
+            ${escapeHtml(step[1])}
+          </li>
+        `).join('')}
+      </ol>
+    </div>
+
+    <div class="assign-box">
+      <label>Add this recipe to your week</label>
+      <div class="assign-row">
+        <select id="assignDay" class="day-select">
+          ${dayNames.map(name => `<option>${name}</option>`).join('')}
+        </select>
+        <button class="primary-button" onclick="assignRecipe('${recipe.id}')">Add</button>
+      </div>
+    </div>
+  `;
+
   showView('recipe');
 }
 
-/*
-ASSIGN RECIPE
-*/
+function showEditRecipeForm(id) {
+  const recipe = recipes.find(r => r.id === id);
+  if (!recipe) return;
+
+  document.getElementById('recipeContent').innerHTML = `
+    <div class="detail-kicker">Edit recipe</div>
+    <label style="display:block; margin:12px 0 6px; color:#666; font-size:12px;">Name</label>
+    <input id="edit_name" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;" value="${escapeHtml(recipe.name)}">
+
+    <label style="display:block; margin:12px 0 6px; color:#666; font-size:12px;">Description</label>
+    <input id="edit_description" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;" value="${escapeHtml(recipe.description || '')}">
+
+    <label style="display:block; margin:12px 0 6px; color:#666; font-size:12px;">Time</label>
+    <input id="edit_time" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;" value="${escapeHtml(recipe.time || '')}">
+
+    <label style="display:block; margin:12px 0 6px; color:#666; font-size:12px;">Servings</label>
+    <input id="edit_servings" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;" value="${escapeHtml(recipe.servings || '')}">
+
+    <div style="display:flex; gap:8px; margin-top:16px;">
+      <button class="primary-button" onclick="saveEditedRecipe('${recipe.id}')">Save</button>
+      <button class="secondary-button" onclick="openRecipe('${recipe.id}')">Cancel</button>
+    </div>
+  `;
+}
+
+function saveEditedRecipe(id) {
+  const recipe = recipes.find(r => r.id === id);
+  if (!recipe) return;
+
+  recipe.name = document.getElementById('edit_name').value.trim() || recipe.name;
+  recipe.description = document.getElementById('edit_description').value.trim();
+  recipe.time = document.getElementById('edit_time').value.trim();
+  recipe.servings = document.getElementById('edit_servings').value.trim();
+
+  saveAll();
+  renderRecipeBox();
+  renderWeek();
+  renderGrocery();
+  openRecipe(id);
+}
+
+function deleteRecipePrompt(id) {
+  if (!confirm('Delete this recipe? This cannot be undone.')) return;
+  deleteRecipe(id);
+}
+
+function deleteRecipe(id) {
+  const index = recipes.findIndex(r => r.id === id);
+  if (index === -1) return;
+
+  recipes.splice(index, 1);
+  Object.keys(week).forEach(day => {
+    if (week[day] === id) week[day] = null;
+  });
+
+  if (window._supabaseClient) {
+    window._supabaseClient.from('recipes').delete().eq('id', id).catch(err => {
+      console.warn('Failed to delete recipe from Supabase', err);
+    });
+  }
+
+  saveAll();
+  renderWeek();
+  renderRecipeBox();
+  renderGrocery();
+  showView('recipes');
+}
 
 function assignRecipe(id) {
   const day = document.getElementById('assignDay').value;
   week[day] = id;
   saveAll();
-  renderWeek(); renderGrocery(); showView('week');
+  renderWeek();
+  renderGrocery();
+  showView('week');
 }
-
-/*
-GROCERY
-*/
 
 function renderGrocery() {
   const container = document.getElementById('groceryList');
   const ingredients = {};
-  Object.values(week).forEach(recipeId => {
+
+  Object.values(week).filter(Boolean).forEach(recipeId => {
     const recipe = recipes.find(r => r.id === recipeId);
     if (!recipe) return;
-    (recipe.ingredients||[]).forEach(item => {
-      const name = item[0]; const quantity = item[1]; if (!ingredients[name]) ingredients[name]=[]; ingredients[name].push(quantity);
+
+    (recipe.ingredients || []).forEach(item => {
+      const name = item[0];
+      const quantity = item[1];
+      if (!ingredients[name]) ingredients[name] = [];
+      ingredients[name].push(quantity);
     });
   });
-  if (!Object.keys(ingredients).length) { container.innerHTML = `<div class="empty">Add some recipes to your week and your grocery list will appear here.</div>`; return; }
-  container.innerHTML = `<div class="grocery-group"><h2>Everything we need</h2>${Object.entries(ingredients).map(([name, quantities], index)=>`<label class="grocery-item"><input type="checkbox" data-grocery="${index}"><span>${quantities.join(' + ')} ${name}</span></label>`).join('')}</div>`;
+
+  if (!Object.keys(ingredients).length) {
+    container.innerHTML = '<div class="empty">Add some recipes to your week and your grocery list will appear here.</div>';
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="grocery-group">
+      <h2>Everything we need</h2>
+      ${Object.entries(ingredients).map(([name, quantities], index) => `
+        <label class="grocery-item">
+          <input type="checkbox" data-grocery="${index}">
+          <span>${quantities.join(' + ')} ${name}</span>
+        </label>
+      `).join('')}
+    </div>
+  `;
 }
 
-/*
-RECIPE IMPORT (placeholder)
-*/
-
-function importRecipe(){
+function importRecipe() {
   const input = document.getElementById('recipeUrl');
   const url = (input && input.value || '').trim();
-  if (!url) { alert('Paste a recipe URL first.'); return; }
-  alert('The recipe importer is the next piece we\'ll connect. Your Recipe Box is already set up to save imported recipes.');
-}
 
-function saveImportedRecipe(importedRecipe){
+  if (url) {
+    alert('Recipe URL import is not connected yet in this build. Use the manual add flow or come back when the backend is connected.');
+    return;
+  }
+
+  const name = window.prompt('Recipe name:');
+  if (!name || !name.trim()) return;
+
+  const description = window.prompt('Short description (optional):', '');
+  const time = window.prompt('Time (optional):', '');
+  const servings = window.prompt('Servings (optional):', '');
+
   const id = 'recipe-' + Date.now();
-  const recipe = { id, name: importedRecipe.name, description: importedRecipe.description||'', time: importedRecipe.time||'', servings: importedRecipe.servings||'', ingredients: importedRecipe.ingredients||[], directions: importedRecipe.directions||[], sourceUrl: importedRecipe.sourceUrl||'' };
-  recipes.push(recipe); saveAll(); renderRecipeBox(); openRecipe(id);
+  const recipe = {
+    id,
+    name: name.trim(),
+    description: description ? description.trim() : '',
+    time: time ? time.trim() : '',
+    servings: servings ? servings.trim() : '',
+    ingredients: [],
+    directions: [],
+    sourceUrl: ''
+  };
+
+  recipes.push(recipe);
+  if (selectedDay) {
+    week[selectedDay] = id;
+    selectedDay = null;
+  }
+
+  saveAll();
+  renderWeek();
+  renderRecipeBox();
+  renderGrocery();
+  openRecipe(id);
 }
 
-/*
-VIEW NAV
-*/
+function saveImportedRecipe(importedRecipe) {
+  const id = 'recipe-' + Date.now();
+  const recipe = {
+    id,
+    name: importedRecipe.name,
+    description: importedRecipe.description || '',
+    time: importedRecipe.time || '',
+    servings: importedRecipe.servings || '',
+    ingredients: importedRecipe.ingredients || [],
+    directions: importedRecipe.directions || [],
+    sourceUrl: importedRecipe.sourceUrl || ''
+  };
 
-function showView(view){
-  document.querySelectorAll('.view').forEach(s=>s.classList.remove('active'));
-  if (view==='week') document.getElementById('weekView').classList.add('active');
-  if (view==='recipes') document.getElementById('recipesView').classList.add('active');
-  if (view==='grocery') document.getElementById('groceryView').classList.add('active');
-  if (view==='recipe') document.getElementById('recipeView').classList.add('active');
-  document.querySelectorAll('.nav-button').forEach(b=>b.classList.remove('active'));
-  if (view==='week') document.getElementById('weekNav').classList.add('active');
-  if (view==='recipes') document.getElementById('recipesNav').classList.add('active');
-  if (view==='grocery') document.getElementById('groceryNav').classList.add('active');
-  window.scrollTo({top:0, behavior:'smooth'});
+  recipes.push(recipe);
+  saveAll();
+  renderRecipeBox();
+  openRecipe(id);
 }
 
-/*
-INITIALIZE UI
-*/
+function showView(view) {
+  document.querySelectorAll('.view').forEach(section => section.classList.remove('active'));
 
-renderWeek(); renderRecipeBox(); renderGrocery();
+  if (view === 'week') document.getElementById('weekView').classList.add('active');
+  if (view === 'recipes') document.getElementById('recipesView').classList.add('active');
+  if (view === 'grocery') document.getElementById('groceryView').classList.add('active');
+  if (view === 'recipe') document.getElementById('recipeView').classList.add('active');
 
-/*
-Small fixes: dynamic week subtitle and nav click handlers
-*/
-(function fixWeekSubtitle(){
-  const subtitle = document.querySelector('#weekView .page-subtitle'); if(!subtitle) return; const now=new Date(); const day=now.getDay(); const mondayOffset=(day===0)?-6:(1-day); const monday=new Date(now); monday.setDate(now.getDate()+mondayOffset); const sunday=new Date(monday); sunday.setDate(monday.getDate()+6); const fmt=(d)=>d.toLocaleString('en-US',{month:'short'}); subtitle.textContent = `${fmt(monday)} ${monday.getDate()} — ${fmt(sunday)} ${sunday.getDate()}`;
-})();
+  document.querySelectorAll('.nav-button').forEach(button => button.classList.remove('active'));
 
-(function ensureNavHandler(){ const navMap={'weekNav':'week','recipesNav':'recipes','groceryNav':'grocery'}; Object.entries(navMap).forEach(([id,view])=>{const el=document.getElementById(id); if(!el||el.dataset.navBound==='true')return; el.addEventListener('click',()=>showView(view)); el.dataset.navBound='true';}); })();
+  if (view === 'week') document.getElementById('weekNav').classList.add('active');
+  if (view === 'recipes') document.getElementById('recipesNav').classList.add('active');
+  if (view === 'grocery') document.getElementById('groceryNav').classList.add('active');
 
-/*
-=================================================
-SUPABASE INTEGRATION (optional)
-=================================================
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-How this works:
-- Create a local file `supabase-config.js` (NOT committed) that defines SUPABASE_URL and SUPABASE_ANON_KEY constants.
-  Example in supabase-config.example.js in the repo.
-- When those constants exist, the app will try to initialize a Supabase client, fetch `recipes` and `weeks` (simple schema explained below), and keep localStorage in sync.
+function ensureNavBindings() {
+  const navMap = { weekNav: 'week', recipesNav: 'recipes', groceryNav: 'grocery' };
+  Object.entries(navMap).forEach(([key, value]) => {
+    const el = document.getElementById(key);
+    if (!el || el.dataset.bound === 'true') return;
+    el.addEventListener('click', () => showView(value));
+    el.dataset.bound = 'true';
+  });
+}
 
-Recommended minimal Supabase schema:
-- Table: recipes
-  - id (text, primary key)
-  - name (text)
-  - description (text)
-  - time (text)
-  - servings (text)
-  - ingredients (json)
-  - directions (json)
-  - source_url (text)
+renderWeek();
+renderRecipeBox();
+renderGrocery();
+updateWeekSubtitle();
+ensureNavBindings();
 
-- Table: weeks
-  - id (text, primary key)  -- use 'default'
-  - plan (json)            -- object with Monday..Sunday mapping to recipe ids
-
-This integration is intentionally forgiving: it will fall back to localStorage when Supabase isn't configured or errors occur.
-*/
-
-async function initSupabase(){
+async function initSupabase() {
   if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
     console.log('Supabase not configured — running in local-only mode.');
     return;
@@ -943,34 +1089,36 @@ async function initSupabase(){
     window._supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const client = window._supabaseClient;
 
-    // fetch recipes
-    const { data: recipesData, error: rErr } = await client.from('recipes').select('*');
-    if (!rErr && Array.isArray(recipesData)) {
-      // map rows to app schema; assumes ingredients/directions stored as JSON arrays
-      recipes = recipesData.map(r => ({ id: r.id, name: r.name, description: r.description, time: r.time, servings: r.servings, ingredients: r.ingredients || [], directions: r.directions || [], sourceUrl: r.source_url || '' }));
+    const { data: recipesData, error: recipesError } = await client.from('recipes').select('*');
+    if (!recipesError && Array.isArray(recipesData) && recipesData.length) {
+      recipes = recipesData.map(r => ({
+        id: r.id,
+        name: r.name,
+        description: r.description || '',
+        time: r.time || '',
+        servings: r.servings || '',
+        ingredients: r.ingredients || [],
+        directions: r.directions || [],
+        sourceUrl: r.source_url || ''
+      }));
     }
 
-    // fetch week plan (row id 'default')
-    const { data: weekData, error: wErr } = await client.from('weeks').select('*').eq('id','default').limit(1).maybeSingle();
-    if (!wErr && weekData && weekData.plan) {
+    const { data: weekData, error: weekError } = await client.from('weeks').select('*').eq('id', 'default').limit(1).maybeSingle();
+    if (!weekError && weekData && weekData.plan) {
       week = weekData.plan;
     }
 
-    // persist locally and re-render
     localStorage.setItem('ourTableRecipes', JSON.stringify(recipes));
     localStorage.setItem('ourTableWeek', JSON.stringify(week));
-
-    renderWeek(); renderRecipeBox(); renderGrocery();
-
-    // listen for local changes and push to Supabase via saveAll (already calls upsert)
-
+    renderWeek();
+    renderRecipeBox();
+    renderGrocery();
     console.log('Supabase initialized — syncing with cloud.');
-  } catch (e) {
-    console.error('Supabase initialization failed', e);
+  } catch (error) {
+    console.error('Supabase initialization failed', error);
   }
 }
 
-// initialize if config is present
 initSupabase();
 
 </script>
