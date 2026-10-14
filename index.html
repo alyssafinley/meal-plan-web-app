@@ -259,7 +259,40 @@ button:focus{outline:3px solid rgba(34,52,46,0.08);outline-offset:2px}
       </div>
     </div>
 
-    <div id="pickerList" class="picker-list"></div>
+<nav class="bottom-nav">
+
+  <button
+    id="weekNav"
+    class="nav-button active"
+    onclick="showView('week')"
+  >
+    <span class="nav-icon">⌂</span>
+    Week
+  </button>
+
+  <button
+    id="recipesNav"
+    class="nav-button"
+    onclick="showView('recipes')"
+  >
+    <span class="nav-icon">▢</span>
+    Recipes
+  </button>
+
+  <button
+    id="groceryNav"
+    class="nav-button"
+    onclick="showView('grocery')"
+  >
+    <span class="nav-icon">□</span>
+    Grocery
+  </button>
+
+</nav>
+
+<script>
+
+/*
 
     <div class="picker-create" style="margin-top:12px; display:flex; justify-content:flex-end;">
       <button type="button" class="primary-button" onclick="createNewFromPicker()">Create new meal</button>
@@ -289,13 +322,220 @@ let recipes = [];
 let week = {};
 
 const defaultRecipes = [
-  { id: "hidden-veggie-pasta", name: "Hidden Veggie Pasta", description: "creamy marinara · roasted vegetables · parmesan", time: "35 min", servings: "4", favorite:false, ingredients:[["Pasta","12 oz"],["Zucchini","2"],["Tomato sauce","1 cup"]], directions:[["Prep","Chop vegetables"],["Cook","Boil pasta and warm sauce"]] },
-  { id: "black-bean-bowls", name: "Black Bean + Sweet Potato Bowls", description: "roasted sweet potatoes · black beans · avocado", time: "40 min", servings: "4", favorite:true, ingredients:[["Sweet potatoes","2"],["Black beans","1 can"],["Avocado","1"]], directions:[["Roast","Roast the sweet potatoes"],["Assemble","Top with beans and avocado"]] },
-  { id: "leftovers", name: "Leftovers + Sandwiches", description: "use what is already in the fridge", time: "—", servings: "as needed", favorite:false, ingredients:[["Leftovers","as needed"],["Bread or wraps","as needed"]], directions:[["Serve","Use leftovers or make sandwiches"]] },
-  { id: "mediterranean-chickpea-pitas", name: "Mediterranean Chickpea Pitas", description: "crispy chickpeas · cucumber · feta · lemon", time: "25 min", servings: "4", favorite:false, ingredients:[["Chickpeas","1 can"],["Cucumber","1"],["Pita","4"]], directions:[["Mix","Make the chickpea salad"],["Serve","Fill pitas"]] },
-  { id: "pizza-night", name: "Pizza Night", description: "everyone gets to choose their toppings", time: "20 min", servings: "4", favorite:true, ingredients:[["Pizza dough or crusts","2"],["Pizza sauce","1 cup"],["Cheese","1 cup"]], directions:[["Assemble","Top crusts and bake"]] },
-  { id: "coconut-shrimp", name: "Coconut Shrimp", description: "crispy coconut coating · lime · rice", time: "30 min", servings: "4", favorite:false, ingredients:[["Shrimp","1 lb"],["Shredded coconut","1 cup"],["Rice","2 cups"]], directions:[["Coat","Bread the shrimp"],["Cook","Fry until golden"]] },
-  { id: "chicken-white-bean-soup", name: "Chicken + White Bean Soup", description: "cozy, brothy, and made for leftovers", time: "50 min", servings: "6", favorite:false, ingredients:[["Chicken breast","1 lb"],["White beans","2 cans"],["Carrots","2"]], directions:[["Simmer","Cook everything together"]] }
+
+  {
+    id: "hidden-veggie-pasta",
+    name: "Hidden Veggie Pasta",
+    description: "creamy marinara · roasted vegetables · parmesan",
+    time: "35 min",
+    servings: "4",
+
+    ingredients: [
+      ["Pasta", "12 oz"],
+      ["Zucchini", "1 medium"],
+      ["Carrot", "1 large"],
+      ["Bell pepper", "1"],
+      ["Marinara sauce", "24 oz"],
+      ["Parmesan", "½ cup"],
+      ["Olive oil", "2 tbsp"]
+    ],
+
+    directions: [
+      ["Roast the vegetables",
+       "Heat the oven to 425°F. Chop the zucchini, carrot, and bell pepper. Toss with olive oil and roast for 20–25 minutes until tender."],
+
+      ["Cook the pasta",
+       "Boil salted water and cook the pasta according to the package directions. Reserve about ½ cup pasta water, then drain."],
+
+      ["Make the sauce",
+       "Blend the roasted vegetables with the marinara until smooth. Add a splash of pasta water if needed."],
+
+      ["Bring it together",
+       "Toss the pasta with the sauce and parmesan. Loosen with reserved pasta water as needed."]
+    ]
+  },
+
+  {
+    id: "black-bean-bowls",
+    name: "Black Bean + Sweet Potato Bowls",
+    description: "roasted sweet potatoes · black beans · avocado",
+    time: "40 min",
+    servings: "4",
+
+    ingredients: [
+      ["Sweet potatoes", "3"],
+      ["Black beans", "2 cans"],
+      ["Quinoa", "1 cup"],
+      ["Avocados", "2"],
+      ["Lime", "2"],
+      ["Olive oil", "2 tbsp"],
+      ["Cumin", "1 tsp"]
+    ],
+
+    directions: [
+      ["Roast the sweet potatoes",
+       "Heat oven to 425°F. Cube sweet potatoes, toss with olive oil and cumin, and roast 25–30 minutes."],
+
+      ["Cook the quinoa",
+       "Combine quinoa with 2 cups water. Simmer covered about 15 minutes, then fluff."],
+
+      ["Warm the beans",
+       "Drain and rinse the beans. Warm gently with cumin, salt, pepper, and lime."],
+
+      ["Assemble",
+       "Divide quinoa between bowls and top with sweet potatoes, beans, avocado, and lime."]
+    ]
+  },
+
+  {
+    id: "leftovers",
+    name: "Leftovers + Sandwiches",
+    description: "use what is already in the fridge",
+    time: "—",
+    servings: "as needed",
+
+    ingredients: [
+      ["Leftovers", "as needed"],
+      ["Bread or wraps", "as needed"],
+      ["Fresh fruit", "as needed"]
+    ],
+
+    directions: [
+      ["Check the fridge",
+       "Start with anything that needs to be used first."],
+
+      ["Build dinner",
+       "Make sandwiches, wraps, or simple plates around what you already have."],
+
+      ["Add something fresh",
+       "Serve with fruit or vegetables."]
+    ]
+  },
+
+  {
+    id: "mediterranean-chickpea-pitas",
+    name: "Mediterranean Chickpea Pitas",
+    description: "crispy chickpeas · cucumber · feta · lemon",
+    time: "25 min",
+    servings: "4",
+
+    ingredients: [
+      ["Chickpeas", "2 cans"],
+      ["Pitas", "4"],
+      ["Cucumber", "1"],
+      ["Tomatoes", "2"],
+      ["Feta", "4 oz"],
+      ["Lemon", "1"],
+      ["Greek yogurt", "½ cup"],
+      ["Olive oil", "2 tbsp"]
+    ],
+
+    directions: [
+      ["Crisp the chickpeas",
+       "Drain and dry chickpeas. Season and air fry at 400°F for 12–15 minutes, shaking halfway."],
+
+      ["Make the salad",
+       "Dice cucumber and tomatoes. Toss with lemon, olive oil, salt, and pepper. Add feta."],
+
+      ["Make the sauce",
+       "Stir Greek yogurt with lemon juice and a splash of water."],
+
+      ["Fill the pitas",
+       "Warm pitas and fill with salad and crispy chickpeas. Drizzle with yogurt sauce."]
+    ]
+  },
+
+  {
+    id: "pizza-night",
+    name: "Pizza Night",
+    description: "everyone gets to choose their toppings",
+    time: "20 min",
+    servings: "4",
+
+    ingredients: [
+      ["Pizza dough or crusts", "2"],
+      ["Pizza sauce", "1 cup"],
+      ["Mozzarella", "8 oz"],
+      ["Favorite toppings", "as needed"]
+    ],
+
+    directions: [
+      ["Heat the oven",
+       "Follow the dough or crust package temperature, usually around 450–500°F."],
+
+      ["Build the pizzas",
+       "Spread sauce over the crusts and add mozzarella and toppings."],
+
+      ["Bake",
+       "Bake until the crust is crisp and the cheese is bubbling."]
+    ]
+  },
+
+  {
+    id: "coconut-shrimp",
+    name: "Coconut Shrimp",
+    description: "crispy coconut coating · lime · rice",
+    time: "30 min",
+    servings: "4",
+
+    ingredients: [
+      ["Shrimp", "1 lb"],
+      ["Shredded coconut", "1 cup"],
+      ["Panko", "1 cup"],
+      ["Eggs", "2"],
+      ["Flour", "½ cup"],
+      ["Lime", "1"],
+      ["Rice", "1½ cups"]
+    ],
+
+    directions: [
+      ["Set up the coating",
+       "Place flour, beaten eggs, and coconut mixed with panko in three separate bowls."],
+
+      ["Coat the shrimp",
+       "Dip shrimp in flour, then egg, then coconut-panko mixture."],
+
+      ["Cook",
+       "Air fry at 400°F for 8–10 minutes, turning halfway."],
+
+      ["Serve",
+       "Serve with rice and lime wedges."]
+    ]
+  },
+
+  {
+    id: "chicken-white-bean-soup",
+    name: "Chicken + White Bean Soup",
+    description: "cozy, brothy, and made for leftovers",
+    time: "50 min",
+    servings: "6",
+
+    ingredients: [
+      ["Chicken breast", "1 lb"],
+      ["Cannellini beans", "2 cans"],
+      ["Carrots", "2"],
+      ["Celery", "2 stalks"],
+      ["Onion", "1"],
+      ["Chicken broth", "6 cups"],
+      ["Spinach", "3 cups"],
+      ["Italian seasoning", "1 tbsp"]
+    ],
+
+    directions: [
+      ["Sauté the vegetables",
+       "Cook diced onion, carrots, and celery in olive oil until softened."],
+
+      ["Simmer",
+       "Add broth, beans, seasoning, and chicken. Simmer until chicken is cooked through."],
+
+      ["Shred the chicken",
+       "Remove chicken, shred with two forks, and return it to the pot."],
+
+      ["Finish",
+       "Stir in spinach and simmer until wilted."]
+    ]
+  }
+
 ];
 const defaultWeek = { Monday:"hidden-veggie-pasta", Tuesday:"black-bean-bowls", Wednesday:"leftovers", Thursday:"mediterranean-chickpea-pitas", Friday:"pizza-night", Saturday:"coconut-shrimp", Sunday:"chicken-white-bean-soup" };
 
@@ -345,25 +585,23 @@ function toggleFavoriteFromPicker(id){ const r=recipes.find(x=>x.id===id); if(!r
 
 document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ const overlay=document.getElementById('mealPickerOverlay'); if(overlay && overlay.style.display==='flex'){ closeMealPicker(); e.stopPropagation(); } } });
 
-function createNewFromPicker(){ const name = window.prompt('Recipe name:'); if(!name||!name.trim()) return; const id = name.toLowerCase().replace(/[^a-z0-9]+/g,'-'); const recipe={id, name:name.trim(), description:'', time:'', servings:'', favorite:false, ingredients:[], directions:[]}; recipes.unshift(recipe); saveAll(); renderRecipeBox(); if(selectedDay){ week[selectedDay]=id; saveAll(); renderWeek(); renderGrocery(); selectedDay=null; closeMealPicker(); } }
+let recipes = loadRecipes();
+let week = loadWeek();
 
-function openCopyPicker(srcDay){ const dest = prompt('Copy to which day? Enter day name (Monday..Sunday):'); if(!dest) return; if(!dayNames.includes(dest)){ alert('Invalid day name'); return; } week[dest]=week[srcDay]; saveAll(); renderWeek(); renderGrocery(); }
+
+function saveAll() {
+  localStorage.setItem(
+    "ourTableRecipes",
+    JSON.stringify(recipes)
+  );
 
 function showView(view){ document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); const el = document.getElementById(view+'View'); if(el) el.classList.add('active'); document.querySelectorAll('.nav-button').forEach(b=>b.classList.remove('active')); const nav = document.getElementById(view+'Nav'); if(nav) nav.classList.add('active'); const headers = document.querySelectorAll('.page-header'); headers.forEach(h=>h.classList.remove('visible'));
  // ensure week grocery only visible when week view active
  if(view==='week'){ document.getElementById('weekGrocery').style.display = (window.innerWidth>=980)?'block':'none'; } else { document.getElementById('weekGrocery').style.display = 'none'; }
 }
 
-function importRecipe(){ const input=document.getElementById('recipeUrl'); const url=(input&&input.value||'').trim(); if(url){ alert('Recipe URL import is not connected yet in this build. Use the manual add flow or come back when the backend is connected.'); return; } const name = window.prompt('Recipe name:'); if(!name||!name.trim()) return; const id = name.toLowerCase().replace(/[^a-z0-9]+/g,'-'); const recipe={id, name:name.trim(), description:'', time:'', servings:'', favorite:false, ingredients:[], directions:[]}; recipes.unshift(recipe); saveAll(); renderRecipeBox(); }
 
-function renderGrocery(){ const container=document.getElementById('groceryList'); const weekAside=document.getElementById('weekGrocery'); const ingredients={}; Object.values(week).filter(Boolean).forEach(recipeId=>{ const recipe=recipes.find(r=>r.id===recipeId); if(!recipe) return; (recipe.ingredients||[]).forEach(item=>{ const name=item[0]; const quantity=item[1]; if(!ingredients[name]) ingredients[name]=[]; ingredients[name].push(quantity); }); }); if(!Object.keys(ingredients).length){ const emptyHTML='<div class="empty">Add some recipes to your week and your grocery list will appear here.</div>'; if(container) container.innerHTML=emptyHTML; if(weekAside) weekAside.innerHTML=emptyHTML; return; } const html=`<div class="grocery-group"><h2>Everything we need</h2>${Object.entries(ingredients).map(([name,quantities],index)=>`<label class="grocery-item"><input type="checkbox" data-grocery="${index}"><span>${quantities.join(' + ')} ${name}</span></label>`).join('')}</div>`; if(container) container.innerHTML=html; if(weekAside) weekAside.innerHTML=html; }
-
-// Initialize
-updateWeekSubtitle(); renderWeek(); renderRecipeBox(); renderGrocery();
-
-// ensure weekGrocery visibility on load
-if(window.innerWidth>=980){ document.getElementById('weekGrocery').style.display='block'; } else { document.getElementById('weekGrocery').style.display='none'; }
-
+/*
 </script>
 </body>
 </html>
