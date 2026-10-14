@@ -53,7 +53,7 @@ button {
 
 .app {
   width: 100%;
-  max-width: 760px;
+  max-width: 1100px;
   min-height: 100vh;
   margin: 0 auto;
   padding-bottom: 90px;
@@ -235,29 +235,38 @@ h2 {
 .meal-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .meal-card {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 15px;
-  padding: 16px 17px;
+  padding: 14px;
   background: var(--paper);
-  display: grid;
-  grid-template-columns: 60px 1fr 20px;
+  display: flex;
   align-items: center;
   gap: 14px;
-  text-align: left;
   color: var(--espresso);
   box-shadow: 0 2px 9px rgba(40,35,25,.025);
-  transition: .16s ease;
+  transition: .16s ease, box-shadow .16s ease;
 }
 
-.meal-card:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow);
+.meal-card:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+
+.card-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
 }
+
+.card-main:focus { outline: 2px solid rgba(38,56,47,.12); border-radius:8px; }
 
 .day {
   color: var(--olive);
@@ -265,315 +274,97 @@ h2 {
   font-weight: 600;
   letter-spacing: 1.5px;
   text-transform: uppercase;
+  min-width:72px;
 }
 
-.day-number {
-  display: block;
-  margin-top: 4px;
-  color: var(--espresso);
-  font-family: "Libre Baskerville", serif;
-  font-size: 20px;
-}
+.day-number { display:block; margin-top:4px; color:var(--espresso); font-family:"Libre Baskerville", serif; font-size:20px; }
 
-.meal-name {
-  font-family: "Libre Baskerville", serif;
-  font-size: 16px;
-  line-height: 1.4;
-}
+.meal-name { font-family:"Libre Baskerville", serif; font-size:16px; line-height:1.4; }
 
-.meal-description {
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: 12px;
-}
+.meal-description { margin-top:4px; color:var(--muted); font-size:12px; }
 
-.arrow {
-  color: var(--terracotta);
-  font-family: Georgia, serif;
-  font-size: 24px;
-}
+.actions { display:flex; gap:8px; align-items:center; }
+
+.card-action { border:none; padding:8px 10px; border-radius:10px; font-weight:600; font-size:13px; }
+.card-action.change { background:transparent; color:var(--olive); border:1px solid var(--line); }
+.card-action.remove { background:var(--terracotta); color:white; }
+
+.meal-card.today { box-shadow: 0 6px 20px rgba(38,56,47,.06); border-left: 4px solid var(--ochre); }
+
+.arrow { color: var(--terracotta); font-family: Georgia, serif; font-size:20px; }
 
 /* RECIPE BOX */
 
-.recipe-box-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+.recipe-box-list { display:flex; flex-direction:column; gap:10px; }
 
-.recipe-box-card {
-  width: 100%;
-  border: 1px solid var(--line);
-  border-radius: 15px;
-  padding: 16px 17px;
-  background: var(--paper);
-  text-align: left;
-  color: var(--espresso);
-}
+.recipe-box-card { width:100%; border:1px solid var(--line); border-radius:15px; padding:16px 17px; background:var(--paper); text-align:left; color:var(--espresso); }
 
-.recipe-box-card .recipe-box-name {
-  font-family: "Libre Baskerville", serif;
-  font-size: 16px;
-}
-
-.recipe-box-card .recipe-box-meta {
-  margin-top: 5px;
-  color: var(--muted);
-  font-size: 12px;
-}
+.recipe-box-card .recipe-box-name { font-family:"Libre Baskerville", serif; font-size:16px; }
+.recipe-box-card .recipe-box-meta { margin-top:5px; color:var(--muted); font-size:12px; }
 
 /* RECIPE DETAIL */
 
-.back-button {
-  border: none;
-  background: transparent;
-  padding: 6px 0 22px;
-  color: var(--olive);
-  font-size: 14px;
-}
+.back-button { border:none; background:transparent; padding:6px 0 22px; color:var(--olive); font-size:14px; }
 
-.detail-kicker {
-  margin-bottom: 9px;
-  color: var(--olive);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 1.7px;
-  text-transform: uppercase;
-}
+.detail-kicker { margin-bottom:9px; color:var(--olive); font-size:11px; font-weight:600; letter-spacing:1.7px; text-transform:uppercase; }
+.detail-title { font-size:30px; line-height:1.2; }
+.detail-description { margin:12px 0 18px; color:var(--muted); font-size:14px; line-height:1.6; }
 
-.detail-title {
-  font-size: 30px;
-  line-height: 1.2;
-}
+.recipe-meta { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:26px; }
+.recipe-meta span { padding:7px 10px; border-radius:20px; background:var(--soft-green); color:var(--forest); font-size:12px; }
 
-.detail-description {
-  margin: 12px 0 18px;
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.6;
-}
+.recipe-section { margin-top:23px; padding-top:20px; border-top:1px solid var(--line); }
+.recipe-section h2 { margin-bottom:12px; }
 
-.recipe-meta {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 26px;
-}
+.ingredients { list-style:none; padding:0; margin:0; }
+.ingredients li { display:flex; justify-content:space-between; gap:20px; padding:9px 0; border-bottom:1px solid #ebe5da; font-size:14px; }
+.ingredients li span:last-child { color:var(--muted); text-align:right; }
 
-.recipe-meta span {
-  padding: 7px 10px;
-  border-radius: 20px;
-  background: var(--soft-green);
-  color: var(--forest);
-  font-size: 12px;
-}
-
-.recipe-section {
-  margin-top: 23px;
-  padding-top: 20px;
-  border-top: 1px solid var(--line);
-}
-
-.recipe-section h2 {
-  margin-bottom: 12px;
-}
-
-.ingredients {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.ingredients li {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 9px 0;
-  border-bottom: 1px solid #ebe5da;
-  font-size: 14px;
-}
-
-.ingredients li span:last-child {
-  color: var(--muted);
-  text-align: right;
-}
-
-.directions {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  counter-reset: recipe-step;
-}
-
-.directions li {
-  position: relative;
-  counter-increment: recipe-step;
-  padding: 0 0 22px 44px;
-  font-size: 14px;
-  line-height: 1.65;
-}
-
-.directions li::before {
-  content: counter(recipe-step);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--forest);
-  color: white;
-  font-size: 12px;
-  line-height: 28px;
-  text-align: center;
-}
-
-.directions strong {
-  display: block;
-  margin-bottom: 3px;
-  font-family: "Libre Baskerville", serif;
-  font-size: 15px;
-  font-weight: 400;
-}
+.directions { list-style:none; padding:0; margin:0; counter-reset: recipe-step; }
+.directions li { position:relative; counter-increment: recipe-step; padding:0 0 22px 44px; font-size:14px; line-height:1.65; }
+.directions li::before { content: counter(recipe-step); position:absolute; top:0; left:0; width:28px; height:28px; border-radius:50%; background:var(--forest); color:white; font-size:12px; line-height:28px; text-align:center; }
+.directions strong { display:block; margin-bottom:3px; font-family:"Libre Baskerville", serif; font-size:15px; font-weight:400; }
 
 /* ASSIGN */
 
-.assign-box {
-  margin-top: 24px;
-  padding: 17px;
-  border: 1px solid var(--line);
-  border-radius: 15px;
-  background: var(--paper);
-}
-
-.assign-box label {
-  display: block;
-  margin-bottom: 7px;
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.assign-row {
-  display: flex;
-  gap: 8px;
-}
-
-.day-select {
-  flex: 1;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  padding: 11px;
-  background: white;
-}
+.assign-box { margin-top:24px; padding:17px; border:1px solid var(--line); border-radius:15px; background:var(--paper); }
+.assign-box label { display:block; margin-bottom:7px; color:var(--muted); font-size:12px; }
+.assign-row { display:flex; gap:8px; }
+.day-select { flex:1; border:1px solid var(--line); border-radius:9px; padding:11px; background:white; }
 
 /* GROCERY */
 
-.grocery-group {
-  margin-bottom: 12px;
-  padding: 17px 18px;
-  border: 1px solid var(--line);
-  border-radius: 15px;
-  background: var(--paper);
-}
+.grocery-group { margin-bottom:12px; padding:17px 18px; border:1px solid var(--line); border-radius:15px; background:var(--paper); }
+.grocery-group h2 { margin-bottom:9px; }
+.grocery-item { display:flex; align-items:center; gap:11px; min-height:39px; border-bottom:1px solid #ebe5da; font-size:14px; }
+.grocery-item:last-child { border-bottom:none; }
+.grocery-item input { appearance:none; width:19px; height:19px; margin:0; border:1px solid #aaa398; border-radius:50%; }
+.grocery-item input:checked { position:relative; border-color:var(--forest); background:var(--forest); }
+.grocery-item input:checked::after { content:"✓"; position:absolute; left:4px; top:0; color:white; font-size:12px; }
+.grocery-item:has(input:checked) span { color:#aaa; text-decoration:line-through; }
 
-.grocery-group h2 {
-  margin-bottom: 9px;
-}
+/* Week layout for desktop */
+.week-grid { display:block; }
+.week-grocery { display:none; }
 
-.grocery-item {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  min-height: 39px;
-  border-bottom: 1px solid #ebe5da;
-  font-size: 14px;
-}
-
-.grocery-item:last-child {
-  border-bottom: none;
-}
-
-.grocery-item input {
-  appearance: none;
-  width: 19px;
-  height: 19px;
-  margin: 0;
-  border: 1px solid #aaa398;
-  border-radius: 50%;
-}
-
-.grocery-item input:checked {
-  position: relative;
-  border-color: var(--forest);
-  background: var(--forest);
-}
-
-.grocery-item input:checked::after {
-  content: "✓";
-  position: absolute;
-  left: 4px;
-  top: 0;
-  color: white;
-  font-size: 12px;
-}
-
-.grocery-item:has(input:checked) span {
-  color: #aaa;
-  text-decoration: line-through;
+@media (min-width:900px) {
+  .view { padding-left:28px; padding-right:28px; }
+  .week-grid { display:grid; grid-template-columns: 1fr 340px; gap:20px; align-items:start; }
+  .week-grocery { display:block; }
 }
 
 /* EMPTY */
 
-.empty {
-  padding: 30px 10px;
-  color: var(--muted);
-  text-align: center;
-  font-size: 13px;
-  line-height: 1.6;
-}
+.empty { padding: 30px 10px; color:var(--muted); text-align:center; font-size:13px; line-height:1.6; }
 
 /* NAV */
 
-.bottom-nav {
-  position: fixed;
-  z-index: 20;
-  bottom: 0;
-  left: 50%;
-  width: min(760px,100%);
-  transform: translateX(-50%);
-  display: flex;
-  justify-content: space-around;
-  padding: 9px 8px max(10px,env(safe-area-inset-bottom));
-  border-top: 1px solid var(--line);
-  background: rgba(255,253,248,.96);
-  backdrop-filter: blur(12px);
-}
+.bottom-nav { position: fixed; z-index: 20; bottom: 0; left: 50%; width: min(1100px,100%); transform: translateX(-50%); display: flex; justify-content: space-around; padding: 9px 8px max(10px,env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: rgba(255,253,248,.96); backdrop-filter: blur(12px); }
 
-.nav-button {
-  border: none;
-  background: transparent;
-  padding: 4px 18px;
-  color: #8b887f;
-  font-size: 10px;
-}
+.nav-button { border:none; background:transparent; padding:4px 18px; color:#8b887f; font-size:10px; }
+.nav-icon { display:block; margin-bottom:3px; font-size:20px; }
+.nav-button.active { color:var(--forest); font-weight:600; }
 
-.nav-icon {
-  display: block;
-  margin-bottom: 3px;
-  font-size: 20px;
-}
-
-.nav-button.active {
-  color: var(--forest);
-  font-weight: 600;
-}
-
-@media (min-width:650px) {
-  .app {
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-}
 </style>
 </head>
 
@@ -599,7 +390,11 @@ h2 {
     <div class="page-subtitle">October 5 — October 11</div>
   </div>
 
-  <div id="mealList" class="meal-list"></div>
+  <!-- New responsive grid: meals + grocery on desktop -->
+  <div class="week-grid">
+    <div id="mealList" class="meal-list"></div>
+    <aside id="weekGrocery" class="week-grocery"></aside>
+  </div>
 
 </section>
 
@@ -625,7 +420,7 @@ h2 {
 
 </section>
 
-<!-- GROCERY -->
+<!-- GROCERY (mobile separate view) -->
 <section id="groceryView" class="view">
 
   <div class="page-header">
@@ -662,13 +457,13 @@ const dayNames = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday",
 let selectedDay = null;
 
 const defaultRecipes = [
-  { id: "hidden-veggie-pasta", name: "Hidden Veggie Pasta", description: "creamy marinara · roasted vegetables · parmesan", time: "35 min", servings: "4", ingredients: [["Pasta","12 oz"],["Zucchini","1 medium"],["Carrot","1 large"],["Bell pepper","1"],["Marinara sauce","24 oz"],["Parmesan","½ cup"],["Olive oil","2 tbsp"]], directions: [["Roast the vegetables","Heat the oven to 425°F. Chop the zucchini, carrot, and bell pepper. Toss with olive oil and roast for 20–25 minutes until tender."],["Cook the pasta","Boil salted water and cook the pasta according to the package directions. Reserve about ½ cup pasta water, then drain."],["Make the sauce","Blend the roasted vegetables with the marinara until smooth. Add a splash of pasta water if needed."],["Bring it together","Toss the pasta with the sauce and parmesan. Loosen with reserved pasta water as needed."]] },
-  { id: "black-bean-bowls", name: "Black Bean + Sweet Potato Bowls", description: "roasted sweet potatoes · black beans · avocado", time: "40 min", servings: "4", ingredients: [["Sweet potatoes","3"],["Black beans","2 cans"],["Quinoa","1 cup"],["Avocados","2"],["Lime","2"],["Olive oil","2 tbsp"],["Cumin","1 tsp"]], directions: [["Roast the sweet potatoes","Heat oven to 425°F. Cube sweet potatoes, toss with olive oil and cumin, and roast 25–30 minutes."],["Cook the quinoa","Combine quinoa with 2 cups water. Simmer covered about 15 minutes, then fluff."],["Warm the beans","Drain and rinse the beans. Warm gently with cumin, salt, pepper, and lime."],["Assemble","Divide quinoa between bowls and top with sweet potatoes, beans, avocado, and lime."]] },
-  { id: "leftovers", name: "Leftovers + Sandwiches", description: "use what is already in the fridge", time: "—", servings: "as needed", ingredients: [["Leftovers","as needed"],["Bread or wraps","as needed"],["Fresh fruit","as needed"]], directions: [["Check the fridge","Start with anything that needs to be used first."],["Build dinner","Make sandwiches, wraps, or simple plates around what you already have."],["Add something fresh","Serve with fruit or vegetables."]] },
-  { id: "mediterranean-chickpea-pitas", name: "Mediterranean Chickpea Pitas", description: "crispy chickpeas · cucumber · feta · lemon", time: "25 min", servings: "4", ingredients: [["Chickpeas","2 cans"],["Pitas","4"],["Cucumber","1"],["Tomatoes","2"],["Feta","4 oz"],["Lemon","1"],["Greek yogurt","½ cup"],["Olive oil","2 tbsp"]], directions: [["Crisp the chickpeas","Drain and dry chickpeas. Season and air fry at 400°F for 12–15 minutes, shaking halfway."],["Make the salad","Dice cucumber and tomatoes. Toss with lemon, olive oil, salt, and pepper. Add feta."],["Make the sauce","Stir Greek yogurt with lemon juice and a splash of water."],["Fill the pitas","Warm pitas and fill with salad and crispy chickpeas. Drizzle with yogurt sauce."]] },
-  { id: "pizza-night", name: "Pizza Night", description: "everyone gets to choose their toppings", time: "20 min", servings: "4", ingredients: [["Pizza dough or crusts","2"],["Pizza sauce","1 cup"],["Mozzarella","8 oz"],["Favorite toppings","as needed"]], directions: [["Heat the oven","Follow the dough or crust package temperature, usually around 450–500°F."],["Build the pizzas","Spread sauce over the crusts and add mozzarella and toppings."],["Bake","Bake until the crust is crisp and the cheese is bubbling."]] },
-  { id: "coconut-shrimp", name: "Coconut Shrimp", description: "crispy coconut coating · lime · rice", time: "30 min", servings: "4", ingredients: [["Shrimp","1 lb"],["Shredded coconut","1 cup"],["Panko","1 cup"],["Eggs","2"],["Flour","½ cup"],["Lime","1"],["Rice","1½ cups"]], directions: [["Set up the coating","Place flour, beaten eggs, and coconut mixed with panko in three separate bowls."],["Coat the shrimp","Dip shrimp in flour, then egg, then coconut-panko mixture."],["Cook","Air fry at 400°F for 8-10 minutes, turning halfway."],["Serve","Serve with rice and lime wedges."]] },
-  { id: "chicken-white-bean-soup", name: "Chicken + White Bean Soup", description: "cozy, brothy, and made for leftovers", time: "50 min", servings: "6", ingredients: [["Chicken breast","1 lb"],["Cannellini beans","2 cans"],["Carrots","2"],["Celery","2 stalks"],["Onion","1"],["Chicken broth","6 cups"],["Spinach","3 cups"],["Italian seasoning","1 tbsp"]], directions: [["Sauté the vegetables","Cook diced onion, carrots, and celery in olive oil until softened."],["Simmer","Add broth, beans, seasoning, and chicken. Simmer until chicken is cooked through."],["Shred the chicken","Remove chicken, shred with two forks, and return it to the pot."],["Finish","Stir in spinach and simmer until wilted."]] }
+  { id: "hidden-veggie-pasta", name: "Hidden Veggie Pasta", description: "creamy marinara · roasted vegetables · parmesan", time: "35 min", servings: "4", ingredients: [["Pasta","12 oz"],["Zucchini","2"],["Tomato sauce","1 cup"]], directions: [["Prep","Chop vegetables"],["Cook","Boil pasta and warm sauce"]] },
+  { id: "black-bean-bowls", name: "Black Bean + Sweet Potato Bowls", description: "roasted sweet potatoes · black beans · avocado", time: "40 min", servings: "4", ingredients: [["Sweet potatoes","2"],["Black beans","1 can"],["Avocado","1"]], directions: [["Roast","Roast the sweet potatoes"],["Assemble","Top with beans and avocado"]] },
+  { id: "leftovers", name: "Leftovers + Sandwiches", description: "use what is already in the fridge", time: "—", servings: "as needed", ingredients: [["Leftovers","as needed"],["Bread or wraps","as needed"]], directions: [["Serve","Use leftovers or make sandwiches"]] },
+  { id: "mediterranean-chickpea-pitas", name: "Mediterranean Chickpea Pitas", description: "crispy chickpeas · cucumber · feta · lemon", time: "25 min", servings: "4", ingredients: [["Chickpeas","1 can"],["Cucumber","1"],["Pita","4"]], directions: [["Mix","Make the chickpea salad"],["Serve","Fill pitas"]] },
+  { id: "pizza-night", name: "Pizza Night", description: "everyone gets to choose their toppings", time: "20 min", servings: "4", ingredients: [["Pizza dough or crusts","2"],["Pizza sauce","1 cup"],["Cheese","1 cup"]], directions: [["Assemble","Top crusts and bake"]] },
+  { id: "coconut-shrimp", name: "Coconut Shrimp", description: "crispy coconut coating · lime · rice", time: "30 min", servings: "4", ingredients: [["Shrimp","1 lb"],["Shredded coconut","1 cup"],["Rice","2 cups"]], directions: [["Coat","Bread the shrimp"],["Cook","Fry until golden"]] },
+  { id: "chicken-white-bean-soup", name: "Chicken + White Bean Soup", description: "cozy, brothy, and made for leftovers", time: "50 min", servings: "6", ingredients: [["Chicken breast","1 lb"],["White beans","2 cans"],["Carrots","2"]], directions: [["Simmer","Cook everything together"]] },
 ];
 
 const defaultWeek = { Monday: "hidden-veggie-pasta", Tuesday: "black-bean-bowls", Wednesday: "leftovers", Thursday: "mediterranean-chickpea-pitas", Friday: "pizza-night", Saturday: "coconut-shrimp", Sunday: "chicken-white-bean-soup" };
@@ -739,32 +534,43 @@ async function saveAll() {
 function renderWeek() {
   const { days } = getCurrentWeekInfo();
   const list = document.getElementById('mealList');
+  const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
 
   list.innerHTML = days.map(day => {
     const recipe = recipes.find(r => r.id === week[day.name]);
+    const isToday = day.name === todayName;
 
     if (!recipe) {
       return `
-        <button class="meal-card" onclick="showRecipesForDay('${day.name}')">
-          <div class="day">${day.name.slice(0,3)}<span class="day-number">${day.dayNumber}</span></div>
-          <div>
-            <div class="meal-name">Choose a recipe</div>
-            <div class="meal-description">Tap to select from your recipe box</div>
+        <div class="meal-card ${isToday ? 'today' : ''}">
+          <button class="card-main" onclick="showRecipesForDay('${day.name}')">
+            <div class="day">${day.name.slice(0,3)}<span class="day-number">${day.dayNumber}</span></div>
+            <div>
+              <div class="meal-name">Choose a recipe</div>
+              <div class="meal-description">Tap to select from your recipe box</div>
+            </div>
+          </button>
+          <div class="actions">
+            <button class="card-action change" onclick="showRecipesForDay('${day.name}')">Change</button>
           </div>
-          <div class="arrow">›</div>
-        </button>
+        </div>
       `;
     }
 
     return `
-      <button class="meal-card" onclick="openRecipe('${recipe.id}')">
-        <div class="day">${day.name.slice(0,3)}<span class="day-number">${day.dayNumber}</span></div>
-        <div>
-          <div class="meal-name">${recipe.name}</div>
-          <div class="meal-description">${recipe.description || ''}</div>
+      <div class="meal-card ${isToday ? 'today' : ''}">
+        <button class="card-main" onclick="openRecipe('${recipe.id}')">
+          <div class="day">${day.name.slice(0,3)}<span class="day-number">${day.dayNumber}</span></div>
+          <div>
+            <div class="meal-name">${recipe.name}</div>
+            <div class="meal-description">${recipe.description || ''}</div>
+          </div>
+        </button>
+        <div class="actions">
+          <button class="card-action change" onclick="showRecipesForDay('${day.name}')">Change</button>
+          <button class="card-action remove" onclick="removeMealFromDay('${day.name}')">Remove</button>
         </div>
-        <div class="arrow">›</div>
-      </button>
+      </div>
     `;
   }).join('');
 }
@@ -778,7 +584,12 @@ function renderRecipeBox() {
 
   let heading = '';
   if (selectedDay) {
-    heading = `<div class="empty" style="padding-top:0;padding-bottom:10px;">Assigning a recipe to ${selectedDay}.</div>`;
+    heading = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <div class="empty" style="padding-top:0;padding-bottom:0; text-align:left;">Assigning a recipe to <strong>${selectedDay}</strong>.</div>
+        <button class="text-button" onclick="cancelAssign()">Cancel</button>
+      </div>
+    `;
   }
 
   list.innerHTML = heading + recipes.map(recipe => `
@@ -793,6 +604,11 @@ function showRecipesForDay(day) {
   selectedDay = day;
   renderRecipeBox();
   showView('recipes');
+}
+
+function cancelAssign() {
+  selectedDay = null;
+  renderRecipeBox();
 }
 
 function assignRecipeToSelectedDay(id) {
@@ -810,7 +626,7 @@ function assignRecipeToSelectedDay(id) {
 }
 
 function escapeHtml(str) {
-  return String(str || '').replace(/[&<>"']/g, (char) => ({
+  return String(str || '').replace(/[&<>\"']/g, (char) => ({
     '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
@@ -952,8 +768,17 @@ function assignRecipe(id) {
   showView('week');
 }
 
+function removeMealFromDay(day) {
+  if (!confirm(`Remove the meal planned for ${day}?`)) return;
+  week[day] = null;
+  saveAll();
+  renderWeek();
+  renderGrocery();
+}
+
 function renderGrocery() {
   const container = document.getElementById('groceryList');
+  const weekAside = document.getElementById('weekGrocery');
   const ingredients = {};
 
   Object.values(week).filter(Boolean).forEach(recipeId => {
@@ -969,11 +794,13 @@ function renderGrocery() {
   });
 
   if (!Object.keys(ingredients).length) {
-    container.innerHTML = '<div class="empty">Add some recipes to your week and your grocery list will appear here.</div>';
+    const emptyHTML = '<div class="empty">Add some recipes to your week and your grocery list will appear here.</div>';
+    if (container) container.innerHTML = emptyHTML;
+    if (weekAside) weekAside.innerHTML = emptyHTML;
     return;
   }
 
-  container.innerHTML = `
+  const html = `
     <div class="grocery-group">
       <h2>Everything we need</h2>
       ${Object.entries(ingredients).map(([name, quantities], index) => `
@@ -984,6 +811,9 @@ function renderGrocery() {
       `).join('')}
     </div>
   `;
+
+  if (container) container.innerHTML = html;
+  if (weekAside) weekAside.innerHTML = html;
 }
 
 function importRecipe() {
@@ -998,128 +828,25 @@ function importRecipe() {
   const name = window.prompt('Recipe name:');
   if (!name || !name.trim()) return;
 
-  const description = window.prompt('Short description (optional):', '');
-  const time = window.prompt('Time (optional):', '');
-  const servings = window.prompt('Servings (optional):', '');
-
-  const id = 'recipe-' + Date.now();
-  const recipe = {
-    id,
-    name: name.trim(),
-    description: description ? description.trim() : '',
-    time: time ? time.trim() : '',
-    servings: servings ? servings.trim() : '',
-    ingredients: [],
-    directions: [],
-    sourceUrl: ''
-  };
-
-  recipes.push(recipe);
-  if (selectedDay) {
-    week[selectedDay] = id;
-    selectedDay = null;
-  }
-
-  saveAll();
-  renderWeek();
-  renderRecipeBox();
-  renderGrocery();
-  openRecipe(id);
-}
-
-function saveImportedRecipe(importedRecipe) {
-  const id = 'recipe-' + Date.now();
-  const recipe = {
-    id,
-    name: importedRecipe.name,
-    description: importedRecipe.description || '',
-    time: importedRecipe.time || '',
-    servings: importedRecipe.servings || '',
-    ingredients: importedRecipe.ingredients || [],
-    directions: importedRecipe.directions || [],
-    sourceUrl: importedRecipe.sourceUrl || ''
-  };
-
-  recipes.push(recipe);
+  const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const recipe = { id, name: name.trim(), description: '', time: '', servings: '', ingredients: [], directions: [] };
+  recipes.unshift(recipe);
   saveAll();
   renderRecipeBox();
-  openRecipe(id);
 }
 
 function showView(view) {
-  document.querySelectorAll('.view').forEach(section => section.classList.remove('active'));
-
-  if (view === 'week') document.getElementById('weekView').classList.add('active');
-  if (view === 'recipes') document.getElementById('recipesView').classList.add('active');
-  if (view === 'grocery') document.getElementById('groceryView').classList.add('active');
-  if (view === 'recipe') document.getElementById('recipeView').classList.add('active');
-
-  document.querySelectorAll('.nav-button').forEach(button => button.classList.remove('active'));
-
-  if (view === 'week') document.getElementById('weekNav').classList.add('active');
-  if (view === 'recipes') document.getElementById('recipesNav').classList.add('active');
-  if (view === 'grocery') document.getElementById('groceryNav').classList.add('active');
-
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(view + 'View').classList.add('active');
+  document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
+  document.getElementById(view + 'Nav').classList.add('active');
 }
 
-function ensureNavBindings() {
-  const navMap = { weekNav: 'week', recipesNav: 'recipes', groceryNav: 'grocery' };
-  Object.entries(navMap).forEach(([key, value]) => {
-    const el = document.getElementById(key);
-    if (!el || el.dataset.bound === 'true') return;
-    el.addEventListener('click', () => showView(value));
-    el.dataset.bound = 'true';
-  });
-}
-
+// Initialize
+updateWeekSubtitle();
 renderWeek();
 renderRecipeBox();
 renderGrocery();
-updateWeekSubtitle();
-ensureNavBindings();
-
-async function initSupabase() {
-  if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
-    console.log('Supabase not configured — running in local-only mode.');
-    return;
-  }
-
-  try {
-    window._supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    const client = window._supabaseClient;
-
-    const { data: recipesData, error: recipesError } = await client.from('recipes').select('*');
-    if (!recipesError && Array.isArray(recipesData) && recipesData.length) {
-      recipes = recipesData.map(r => ({
-        id: r.id,
-        name: r.name,
-        description: r.description || '',
-        time: r.time || '',
-        servings: r.servings || '',
-        ingredients: r.ingredients || [],
-        directions: r.directions || [],
-        sourceUrl: r.source_url || ''
-      }));
-    }
-
-    const { data: weekData, error: weekError } = await client.from('weeks').select('*').eq('id', 'default').limit(1).maybeSingle();
-    if (!weekError && weekData && weekData.plan) {
-      week = weekData.plan;
-    }
-
-    localStorage.setItem('ourTableRecipes', JSON.stringify(recipes));
-    localStorage.setItem('ourTableWeek', JSON.stringify(week));
-    renderWeek();
-    renderRecipeBox();
-    renderGrocery();
-    console.log('Supabase initialized — syncing with cloud.');
-  } catch (error) {
-    console.error('Supabase initialization failed', error);
-  }
-}
-
-initSupabase();
 
 </script>
 
