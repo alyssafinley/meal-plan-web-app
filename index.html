@@ -329,7 +329,8 @@
     const defaultWeek = { Monday: 'hidden-veggie-pasta', Tuesday: 'black-bean-bowls', Wednesday: 'leftovers', Thursday: 'mediterranean-chickpea-pitas', Friday: 'pizza-night', Saturday: 'coconut-shrimp', Sunday: 'chicken-white-bean-soup' };
 
     let selectedDay = null;
-    let state = { recipes: loadRecipes(), week: loadWeek(), grocery: loadGrocery() };
+    // Initialize an empty state first to avoid using state during its own construction
+    let state = { recipes: [], week: {}, grocery: [] };
 
     function escapeHtml(value) { return String(value || '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char])); }
 
@@ -378,7 +379,7 @@
       const { days } = getCurrentWeekInfo();
       const itemMap = new Map();
       days.forEach((day) => {
-        const recipe = state.recipes.find((r) => r.id === (state.week || {})[day.name]);
+        const recipe = (state.recipes || []).find((r) => r.id === (state.week || {})[day.name]);
         if (!recipe) return;
         (recipe.ingredients || []).forEach(([ingredient, amount]) => {
           const key = ingredient.trim().toLowerCase();
@@ -395,7 +396,7 @@
 
     function showView(view) { document.querySelectorAll('.view').forEach((v) => v.classList.remove('active')); const el = document.getElementById(view + 'View'); if (el) el.classList.add('active'); document.querySelectorAll('.nav-button').forEach((btn) => btn.classList.remove('active')); const nav = document.getElementById(view + 'Nav'); if (nav) nav.classList.add('active'); }
 
-    function renderWeek() { const { days } = getCurrentWeekInfo(); const list = document.getElementById('mealList'); const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' }); list.innerHTML = days.map((day) => { const recipe = state.recipes.find((r) => r.id === (state.week || {})[day.name]); const isToday = day.name === todayName; const cardBody = recipe ? `<div class="meal-name">${escapeHtml(recipe.name)}</div><p class="meal-description">${escapeHtml(recipe.description)}</p>` : `<div class="meal-name">No meal planned</div>`; const actions = recipe ? `<div class="actions"><button class="card-action add" type="button" onclick="openMealPickerForDay('${day.name}')">Swap</button><button class="card-action change" type="button" onclick="openRecipe('${recipe.id}')">Open</button><button class="card-action remove" type="button" onclick="removeMealFromDay('${day.name}')">Remove</button></div>` : `<div class="actions"><button class="card-action add" type="button" onclick="openMealPickerForDay('${day.name}')">Add</button></div>`; return `
+    function renderWeek() { const { days } = getCurrentWeekInfo(); const list = document.getElementById('mealList'); const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' }); list.innerHTML = days.map((day) => { const recipe = (state.recipes || []).find((r) => r.id === (state.week || {})[day.name]); const isToday = day.name === todayName; const cardBody = recipe ? `<div class="meal-name">${escapeHtml(recipe.name)}</div><p class="meal-description">${escapeHtml(recipe.description)}</p>` : `<div class="meal-name">No meal planned</div>`; const actions = recipe ? `<div class="actions"><button class="card-action add" type="button" onclick="openMealPickerForDay('${day.name}')">Swap</button><button class="card-action change" type="button" onclick="openRecipe('${recipe.id}')">Open</button><button class="card-action remove" type="button" onclick="removeMealFromDay('${day.name}')">Remove</button></div>` : `<div class="actions"><button class="card-action add" type="button" onclick="openMealPickerForDay('${day.name}')">Add</button></div>`; return `
           <div class="meal-card ${isToday ? 'today' : ''}">
             <div class="day">
               <div>${escapeHtml(day.name)}</div>
@@ -546,19 +547,24 @@
 
     function removeMealFromDay(day) { state.week[day] = null; saveAll(); renderWeek(); }
 
-    function openMealPickerForDay(day) { selectedDay = day; document.getElementById('pickerDayLabel').textContent = day; document.getElementById('pickerSearch').value = ''; document.getElementById('filterFavorites').checked = false; renderPickerList(); document.getElementById('mealPickerOverlay').style.display = 'flex'; document.body.style.overflow = 'hidden'; setTimeout(() => document.getElementById('pickerSearch').focus(), 50); }
+    function openMealPickerForDay(day) { selectedDay = day; document.getElementById('pickerDayLabel').textContent = day; const pickerSearch = document.getElementById('pickerSearch'); if(pickerSearch) pickerSearch.value = ''; const fav = document.getElementById('filterFavorites'); if(fav) fav.checked = false; renderPickerList(); document.getElementById('mealPickerOverlay').style.display = 'flex'; document.body.style.overflow = 'hidden'; setTimeout(() => { const ps = document.getElementById('pickerSearch'); if(ps) ps.focus(); }, 50); }
     function closeMealPicker() { document.getElementById('mealPickerOverlay').style.display = 'none'; document.body.style.overflow = ''; selectedDay = null; }
 
-    function renderPickerList() { const list = document.getElementById('pickerList'); const searchTerm = (document.getElementById('pickerSearch').value || '').toLowerCase(); const favoritesOnly = document.getElementById('filterFavorites').checked; const filtered = state.recipes.filter((recipe) => { const matchText = (recipe.name + ' ' + (recipe.description || '')).toLowerCase(); const matchesText = matchText.includes(searchTerm); const matchesFavorite = !favoritesOnly || recipe.favorite; return matchesText && matchesFavorite; }); list.innerHTML = filtered.map((recipe) => `<div class="picker-card"><div><div style="font-weight: 800;">${escapeHtml(recipe.name)}</div><div class="meta" style="color: var(--muted); font-size: 12px;">${escapeHtml(recipe.description || recipe.time || 'Recipe')}</div></div><div class="actions"><button type="button" class="card-action" onclick="assignRecipeToDay('${recipe.id}')">Add</button><button type="button" class="card-action" onclick="toggleFavorite('${recipe.id}')">${recipe.favorite ? '★' : '☆'}</button></div></div>`).join('') || '<div class="empty">No recipes match your filter.</div>'; }
+    function renderPickerList() { const list = document.getElementById('pickerList'); const searchTerm = (document.getElementById('pickerSearch') && document.getElementById('pickerSearch').value || '').toLowerCase(); const favoritesOnly = document.getElementById('filterFavorites') && document.getElementById('filterFavorites').checked; const filtered = state.recipes.filter((recipe) => { const matchText = (recipe.name + ' ' + (recipe.description || '')).toLowerCase(); const matchesText = matchText.includes(searchTerm); const matchesFavorite = !favoritesOnly || recipe.favorite; return matchesText && matchesFavorite; }); list.innerHTML = filtered.map((recipe) => `<div class="picker-card"><div><div style="font-weight: 800;">${escapeHtml(recipe.name)}</div><div class="meta" style="color: var(--muted); font-size: 12px;">${escapeHtml(recipe.description || recipe.time || 'Recipe')}</div></div><div class="actions"><button type="button" class="card-action" onclick="assignRecipeToDay('${recipe.id}')">Add</button><button type="button" class="card-action" onclick="toggleFavorite('${recipe.id}')">${recipe.favorite ? '★' : '☆'}</button></div></div>`).join('') || '<div class="empty">No recipes match your filter.</div>'; }
 
     function assignRecipeToDay(id) { if (!selectedDay) return; state.week[selectedDay] = id; saveAll(); renderWeek(); closeMealPicker(); }
     function toggleFavorite(id) { const recipe = state.recipes.find((item) => item.id === id); if (!recipe) return; recipe.favorite = !recipe.favorite; saveAll(); renderPickerList(); renderRecipeBox(); }
 
     document.addEventListener('keydown', (event) => { if (event.key === 'Escape') { const overlay = document.getElementById('mealPickerOverlay'); if (overlay && overlay.style.display === 'flex') { closeMealPicker(); } } });
-    document.getElementById('pickerSearch').addEventListener('input', renderPickerList);
-    document.getElementById('filterFavorites').addEventListener('change', renderPickerList);
+    const pickerSearchEl = document.getElementById('pickerSearch'); if (pickerSearchEl) pickerSearchEl.addEventListener('input', renderPickerList);
+    const filterFavEl = document.getElementById('filterFavorites'); if (filterFavEl) filterFavEl.addEventListener('change', renderPickerList);
 
-    // init
+    // initialize state from storage and render
+    state.recipes = loadRecipes();
+    state.week = loadWeek();
+    state.grocery = loadGrocery();
+
+    // init render
     renderRecipeBox(); renderWeek(); showView('week');
   </script>
 </body>
