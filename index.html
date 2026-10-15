@@ -142,16 +142,20 @@
 
     .empty { padding: 36px 12px; color: var(--muted); font-size: 14px; border: 1px dashed var(--line); border-radius: 8px; background: transparent; }
 
+    /* Improved bottom navigation: higher contrast, solid background, consistent icons */
     .bottom-nav {
       position: fixed; z-index: 9999; bottom: 18px; left: 50%; transform: translateX(-50%);
-      display: flex; gap: 10px; padding: 8px; background: transparent; pointer-events: auto;
+      display: flex; gap: 10px; padding: 8px; background: rgba(255,255,255,0.92); pointer-events: auto;
+      border-radius: 14px; box-shadow: 0 10px 30px rgba(16,14,12,0.08); backdrop-filter: blur(6px); border: 1px solid rgba(0,0,0,0.04);
     }
     .nav-button {
-      background: transparent; border: 1px solid transparent; padding: 8px 12px; border-radius: 8px;
-      font-weight: 700; font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; cursor: pointer;
+      background: transparent; border: none; padding: 8px 12px; border-radius: 10px;
+      font-weight: 700; font-size: 13px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; min-width: 64px;
     }
-    .nav-button.active { color: var(--accent-forest); border-color: var(--line); background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.6)); }
-    .nav-button .nav-icon { font-size: 16px; opacity: 0.9; }
+    .nav-button .nav-icon { width: 20px; height: 20px; display: block; fill: currentColor; }
+    .nav-button .nav-label { font-size: 12px; color: inherit; }
+    .nav-button.active { color: var(--accent-forest); background: linear-gradient(180deg, rgba(34,52,46,0.06), rgba(34,52,46,0.02)); border: 1px solid rgba(34,52,46,0.06); }
+    .nav-button:focus { outline: 3px solid rgba(34,52,46,0.12); outline-offset: 3px; }
 
     .detail-kicker { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-sage); font-weight: 700; }
     .detail-title { margin: 10px 0; }
@@ -163,7 +167,8 @@
       .meal-card { flex-direction: column; }
       .actions { width: 100%; }
       .recipe-box-card { flex-direction: column; align-items: flex-start; }
-      .bottom-nav { width: calc(100% - 24px); justify-content: center; }
+      .bottom-nav { width: calc(100% - 24px); left: 50%; transform: translateX(-50%); }
+      .nav-button { min-width: 48px; }
       .grocery-qty { min-width: 100px; }
     }
   </style>
@@ -280,11 +285,30 @@
   </div>
 
   <nav class="bottom-nav" aria-label="Main navigation">
-    <button type="button" id="weekNav" class="nav-button active" onclick="showView('week')"><span class="nav-icon">⌂</span><span>Week</span></button>
-    <button type="button" id="recipesNav" class="nav-button" onclick="showView('recipes')"><span class="nav-icon">▢</span><span>Recipes</span></button>
-    <button type="button" id="groceryNav" class="nav-button" onclick="showView('grocery')"><span class="nav-icon">🧾</span><span>Grocery</span></button>
-    <button type="button" id="pantryNav" class="nav-button" onclick="showView('pantry')"><span class="nav-icon">🍱</span><span>Pantry</span></button>
-    <button type="button" id="historyNav" class="nav-button" onclick="showView('history')"><span class="nav-icon">🕘</span><span>History</span></button>
+    <button type="button" id="weekNav" class="nav-button active" onclick="showView('week')" aria-label="Week">
+      <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 11.5L12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-8.5z"></path></svg>
+      <span class="nav-label">Week</span>
+    </button>
+
+    <button type="button" id="recipesNav" class="nav-button" onclick="showView('recipes')" aria-label="Recipes">
+      <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"></path></svg>
+      <span class="nav-label">Recipes</span>
+    </button>
+
+    <button type="button" id="groceryNav" class="nav-button" onclick="showView('grocery')" aria-label="Grocery">
+      <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.44C5.89 14.37 6.3 15.5 7.2 15.5h12.45v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 12h7.45c.75 0 1.41-.41 1.75-1.03L21.8 4.6A1 1 0 0 0 20.88 4H5.21L4.27 2H1z"></path></svg>
+      <span class="nav-label">Grocery</span>
+    </button>
+
+    <button type="button" id="pantryNav" class="nav-button" onclick="showView('pantry')" aria-label="Pantry">
+      <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 4h16v2H4V4zm0 4h16v12H4V8zm6 2v8h4v-8h-4z"></path></svg>
+      <span class="nav-label">Pantry</span>
+    </button>
+
+    <button type="button" id="historyNav" class="nav-button" onclick="showView('history')" aria-label="History">
+      <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M13 3a9 9 0 1 0 8.95 8H19a7 7 0 1 1-6-6.92V3zM12 7v6l5 3 .75-1.23L13 12V7z"></path></svg>
+      <span class="nav-label">History</span>
+    </button>
   </nav>
 
   <script>
